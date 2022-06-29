@@ -1,0 +1,9 @@
+---
+kind: pipeline
+name: default
+steps:
+  - name: hello-world
+    image: base/python:alpine
+    commands:
+      - env
+      - echo "Success!"
