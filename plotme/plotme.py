@@ -2,6 +2,7 @@ import argparse
 import glob
 import json
 import logging
+import os
 from pathlib import Path
 import sys
 
@@ -30,7 +31,7 @@ def main(kwargs={}):
 
     plot_info_file = kwargs.get('plot_info', 'plot_info.json')
 
-    data_root = Path(kwargs.get('data_root', Path.home()))
+    data_root = Path(kwargs.get('data_root', os.getcwd()))
     # TODO: add setting for depth of glob
     plot_info_files = data_root.glob(f"**/*{plot_info_file}")
     for file in plot_info_files:
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     # parse the arguments
     parser = argparse.ArgumentParser(description='automates plotting of tabular data')
 
-    parser.add_argument('-s', action="store", default="", type=str,
+    parser.add_argument('-s', dest='data_root', action="store", default="", type=str,
                         help="Specify data directory")
     parser.add_argument('-gt', action="store_true",
                         help="generate a template")
