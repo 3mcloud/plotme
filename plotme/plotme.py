@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     helper.start_logging(log_level=logging.INFO)
     try:
-        main(args)
+        main(vars(args))
         # single_plot()
     except Exception as e:
         logging.exception("Fatal error in main")
