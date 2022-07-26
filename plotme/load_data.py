@@ -72,8 +72,7 @@ class from_xlsx(Data):
         super(from_xlsx, self).__init__()
         self.d_path = d_path
 
-    pass
 
     def call(self, input, **kwargs):
         df = pd.read_excel(self.d_path, engine='openpyxl')
-        pass
+        return df
