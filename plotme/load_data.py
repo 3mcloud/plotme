@@ -41,10 +41,18 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
     return df
 
 
-def retrieve_x(filename, x_id, kwargs={}):
+def retrieve_x(filename, x_id, df, x_values, kwargs={}):
     name_significance = kwargs.get('name_significance', "None")
+    #appends list for filename significance
     if name_significance == "x_values":
         x = retrieve_x_from_name(filename, x_id)
+        x_values.append(x)
+    #returns x_values if x_values already populated
+    elif x_values.size is not 0:
+        x = x_values
+    #finds x_values if none exist
+    else:
+        x = df[x_id]
     return x
 
 def retrieve_x_from_name(filename, x_id):
@@ -66,12 +74,13 @@ def load(directory, x_id='', y_id='', kwargs={}):
         return None
     elif len(data_files) == 1:  # assume data file contains at least 1 trace
         df = read(data_files[0], index_col=0)
-    # elif:
-    #     for file in data_files:
-    #         if isinstance(y_id, str):
-    #             x_value = retrieve_x(file, x_id, kwargs)
-    #             x_values.append(x_value)
-    #             df = build_data("xlsx", file)
+    else:
+        x_values = []
+        for file in data_files:
+            if isinstance(y_id, str):
+                df = build_data("xlsx", file)
+                x_values = retrieve_x(file, x_id, df, x_values, kwargs)
+    #             
     #             try:
     #                 y_value = max(df[y_id])
     #             except ValueError:
