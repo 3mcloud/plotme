@@ -68,8 +68,8 @@ def single_plot(kwargs={}):
     y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
 
     split_on = kwargs.get('split_on', '_')  # used to split x_id out of file name
-    exclude_from_trace_label = kwargs.get('exclude_from_trace_label')  # remove this
-    constant_lines = kwargs.get('constant_lines')
+    exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
+    constant_lines = kwargs.get('constant_lines', {})
     constant_lines_x = constant_lines.get('x')  # list
     constant_lines_y = constant_lines.get('y')  # list
     add_line = True
@@ -77,6 +77,7 @@ def single_plot(kwargs={}):
     enable_error_bars = False
 
     folders = glob.glob(f"{plot_dir}/*/")
+    folders.append(plot_dir)  # include the data_root directory
     x_dict = {}
     if add_line:
         y_dict = {'y=1': [1, 1]}
@@ -94,12 +95,13 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        x, y = load_data.retrieve_data(directory, x_id, y_id, kwargs)
-        # if not x:
-        #     x, y = collect_from_pkl(directory, x_id, y_id)
-        x_max = max(max(x), x_max)
-        x_dict.update({d_name_part: x})
-        y_dict.update({d_name_part: y})
+        loaded_data = load_data.load(directory, x_id, y_id, kwargs)
+        if loaded_data:
+            # if not x:
+            #     x, y = collect_from_pkl(directory, x_id, y_id)
+            x_max = max(max(x), x_max)
+            x_dict.update({d_name_part: x})
+            y_dict.update({d_name_part: y})
 
     if add_line:
         x_dict['y=1'] = [0, x_max]
@@ -141,7 +143,7 @@ if __name__ == "__main__":
 
     helper.start_logging(log_level=logging.INFO)
     try:
-        main(args)
+        main(vars(args))
         # single_plot()
     except Exception as e:
         logging.exception("Fatal error in main")
