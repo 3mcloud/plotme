@@ -16,7 +16,7 @@ def collect_1_x_per_file(directory, param_id, column_id, split_on='_'):
         param_value = Path(file).stem.split(param_id)[1].split(split_on)[0]
         param_value = float(param_value)
         x_values.append(param_value)
-        df = pd.read_excel(file, engine='openpyxl')
+        df = build_data("xlsx", file)
         #df = pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2='')  # get variables from plot_info
         try:
             max_norm_cont = max(df[column_id])
@@ -36,3 +36,44 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
     df = df.drop(labels=idxs, axis=0)
 
     return df
+
+
+
+
+
+def build_data(dtype, d_path) -> pd.DataFrame:
+    if dtype == "xlsx":
+        cl = from_xlsx(d_path)
+        df = cl.retrieve_data()
+    elif dtype == "csv":
+        return
+    else:
+        print("Unrecognized data file type")
+        exit(1)
+    return df
+
+
+class Data:
+    def __init__(self) -> None:
+        super(Data, self).__init__()
+    
+    def retrieve_data(self):
+        return self([])
+    #Open file
+    #Retrieve x
+    #Retrieve y
+    #Preprocessing
+    #Postprocessing
+    #Return refined data
+
+
+class from_xlsx(Data):
+    def __init__(self, d_path) -> None:
+        super(from_xlsx, self).__init__()
+        self.d_path = d_path
+
+    pass
+
+    def call(self, input, **kwargs):
+        df = pd.read_excel(self.d_path, engine='openpyxl')
+        pass
