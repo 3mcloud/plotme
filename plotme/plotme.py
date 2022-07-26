@@ -31,7 +31,6 @@ def main(kwargs={}):
     plot_info_file = kwargs.get('plot_info', 'plot_info.json')
 
     data_root = Path(kwargs.get('data_root', os.getcwd()))
-    # TODO: add setting for depth of glob
     plot_info_files = data_root.glob(f"**/*{plot_info_file}")
     for file in plot_info_files:
         dir_path = file.parent
@@ -63,10 +62,10 @@ def single_plot(kwargs={}):
 
     plot_dir = kwargs.get('plot_dir', Path.home())
     title = kwargs.get('title', 'plotme plot')
-    x_id = kwargs.get('x_id', 'x_id not set')
+    x_id = kwargs.get('x_id', 'index')
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
-    y_id = kwargs.get('y_id', 'y_id not set')
-    y_title = kwargs.get('y_title', y_id)
+    y_id = kwargs.get('y_id', 'headers')
+    y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
 
     split_on = kwargs.get('split_on', '_')  # used to split x_id out of file name
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label')  # remove this
@@ -95,7 +94,7 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        x, y = load_data.collect_1_x_per_file(directory, x_id, y_id, split_on)
+        x, y = load_data.retrieve_data(directory, x_id, y_id, kwargs)
         # if not x:
         #     x, y = collect_from_pkl(directory, x_id, y_id)
         x_max = max(max(x), x_max)

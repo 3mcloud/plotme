@@ -1,0 +1,15 @@
+{
+  "title_text": "plot title",
+  "x_title": "label in plot, y_id used if unspecified",
+  "x_id": "x column header name or name of parameter to be extracted from file name",
+  "y_title": "label in plot, y_id used if unspecified",
+  "y_id": ["list of column headers, single column header or column letter"],
+  "trace_type": "scatter, line, bar etc",
+  "schema": {
+    "file_extension": "csv or xlsx",
+    "header": "row_n"
+  },
+  "pre": [{"remove_null": "all or y_id"}, {"remove_zero": "all or y_id"}],
+  "post": [],
+  "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
+}

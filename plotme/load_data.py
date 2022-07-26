@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from read import read
+
 
 def collect_1_x_per_file(directory, param_id, column_id, split_on='_'):
     match_string = str(Path(directory, "*.xlsx"))
@@ -38,7 +40,30 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
     return df
 
 
+def load(directory, x_id='', y_id='', kwargs={}):
+    schema = kwargs.get('schema', {})
+    file_extension = schema.get('file_extension', 'csv')
+    match_string = str(Path(directory, f"*.{file_extension}"))
+    data_files = glob.glob(match_string, recursive=False)
+    y_values = []
+    x_values = []
+    if len(data_files) == 1:  # assume data file contains at least 1 trace
+        df = read(data_files[0], index_col=0)
+    else:
+        for file in data_files:
+            if isinstance(y_id, str):
+                x_value = Path(file).stem.split(x_id)[1].split(x_id)[0]
+                x_value = float(x_value)
+                x_values.append(x_value)
+                df = build_data("xlsx", file)
+                try:
+                    y_value = max(df[y_id])
+                except ValueError:
+                    y_value = 0
+                y_values.append(y_value)
+            # elif isinstance(y_id, list):
 
+    return df
 
 
 def build_data(dtype, d_path) -> pd.DataFrame:
