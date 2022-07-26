@@ -40,6 +40,19 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
     return df
 
 
+def retrieve_x(filename, x_id, kwargs={}):
+    name_significance = kwargs.get('name_significance', "None")
+    if name_significance == "x_values":
+        x = retrieve_x_from_name(filename, x_id)
+    return x
+
+def retrieve_x_from_name(filename, x_id):
+    x_value = Path(filename).stem.split(x_id)[1].split(x_id)[0]
+    x_value = float(x_value)
+    return x_value
+
+
+
 def load(directory, x_id='', y_id='', kwargs={}):
     schema = kwargs.get('schema', {})
     file_extension = schema.get('file_extension', 'csv')
@@ -52,8 +65,7 @@ def load(directory, x_id='', y_id='', kwargs={}):
     else:
         for file in data_files:
             if isinstance(y_id, str):
-                x_value = Path(file).stem.split(x_id)[1].split(x_id)[0]
-                x_value = float(x_value)
+                x_value = retrieve_x(file, x_id, kwargs)
                 x_values.append(x_value)
                 df = build_data("xlsx", file)
                 try:
