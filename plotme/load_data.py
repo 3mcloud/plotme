@@ -1,4 +1,5 @@
 import glob
+import logging
 
 from pathlib import Path
 
@@ -47,21 +48,24 @@ def load(directory, x_id='', y_id='', kwargs={}):
     data_files = glob.glob(match_string, recursive=False)
     y_values = []
     x_values = []
-    if len(data_files) == 1:  # assume data file contains at least 1 trace
+    if len(data_files) == 0:
+        logging.debug(f"no data files found in {directory}")
+        return None
+    elif len(data_files) == 1:  # assume data file contains at least 1 trace
         df = read(data_files[0], index_col=0)
-    else:
-        for file in data_files:
-            if isinstance(y_id, str):
-                x_value = Path(file).stem.split(x_id)[1].split(x_id)[0]
-                x_value = float(x_value)
-                x_values.append(x_value)
-                df = build_data("xlsx", file)
-                try:
-                    y_value = max(df[y_id])
-                except ValueError:
-                    y_value = 0
-                y_values.append(y_value)
-            # elif isinstance(y_id, list):
+    # elif:
+    #     for file in data_files:
+    #         if isinstance(y_id, str):
+    #             x_value = Path(file).stem.split(x_id)[1].split(x_id)[0]
+    #             x_value = float(x_value)
+    #             x_values.append(x_value)
+    #             df = build_data("xlsx", file)
+    #             try:
+    #                 y_value = max(df[y_id])
+    #             except ValueError:
+    #                 y_value = 0
+    #             y_values.append(y_value)
+    #         # elif isinstance(y_id, list):
 
     return df
 
