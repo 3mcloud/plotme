@@ -12,9 +12,8 @@ import plotly.io as pio
 from dirhash import dirhash
 from plotly.subplots import make_subplots
 
-
-import from_xlsx
 import helper
+import load_data
 
 
 def main(kwargs={}):
@@ -96,7 +95,7 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        x, y = from_xlsx.collect_1_x_per_file(directory, x_id, y_id, split_on)
+        x, y = load_data.collect_1_x_per_file(directory, x_id, y_id, split_on)
         # if not x:
         #     x, y = collect_from_pkl(directory, x_id, y_id)
         x_max = max(max(x), x_max)
