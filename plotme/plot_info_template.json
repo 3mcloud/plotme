@@ -7,9 +7,10 @@
   "trace_type": "scatter, line, bar etc",
   "schema": {
     "file_extension": "csv or xlsx",
-    "header": "row_n"
+    "header": "row_n",
+    "index_col": "int of index column, NULL or don't include if not used"
   },
   "pre": [{"remove_null": "all or y_id"}, {"remove_zero": "all or y_id"}],
-  "post": [],
+  "post": [{"avg":  "all or y_id"}, {"max":  "all or y_id"}, {"min":  "all or y_id"}],
   "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
 }

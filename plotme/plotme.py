@@ -13,7 +13,7 @@ from dirhash import dirhash
 from plotly.subplots import make_subplots
 
 import helper
-import load_data
+from load_data import Folder
 
 
 def main(kwargs={}):
@@ -95,13 +95,13 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        loaded_data = load_data.load(directory, x_id, y_id, kwargs)
-        if loaded_data:
-            # if not x:
-            #     x, y = collect_from_pkl(directory, x_id, y_id)
-            x_max = max(max(x), x_max)
-            x_dict.update({d_name_part: x})
-            y_dict.update({d_name_part: y})
+        folder_obj = Folder(directory, x_id, y_id, kwargs)
+        # if loaded_data:
+        #     # if not x:
+        #     #     x, y = collect_from_pkl(directory, x_id, y_id)
+        #     x_max = max(max(x), x_max)
+        #     x_dict.update({d_name_part: x})
+        #     y_dict.update({d_name_part: y})
 
     if add_line:
         x_dict['y=1'] = [0, x_max]
@@ -125,7 +125,7 @@ def single_plot(kwargs={}):
     fig.update_layout(height=600, width=1000, title_text=title)
 
     fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
-    fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
+    # fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
     fig.show()
 
 
