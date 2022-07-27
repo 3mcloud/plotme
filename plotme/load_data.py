@@ -74,6 +74,7 @@ class Folder(object):
 
         schema = kwargs.get('schema', {})
         file_extension = schema.get('file_extension', 'csv')
+        index_col = schema.get('index_col')
         x_id_in_file_name = kwargs.get('x_id_in_file_name', False)
         match_string = str(Path(directory, f"*.{file_extension}"))
         data_files = glob.glob(match_string, recursive=False)
@@ -85,10 +86,10 @@ class Folder(object):
         elif len(data_files) > 0:
             for file in data_files:  # read in all the dfs
                 file_info = {}
-                df = read(file, index_col=0)
+                df = read(file, index_col=index_col)
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)
-                file_info['df_type'] = self.determine_df_type(df)
+                file_info['df_type'] = self.determine_df_type(df, file_info)
                 self.dataframes.append(df)
                 self.file_infos.append(file_info)
 
@@ -111,17 +112,16 @@ class Folder(object):
         #     y_values.append(y_value)
         # # elif isinstance(y_id, list):
 
-    def determine_df_type(self, df):
+    def determine_df_type(self, df, file_info):
 
         y_id = self.y_id
         if isinstance(y_id, str):
             if y_id == 'headers':
                 self.y_id = df.columns.to_list()
 
-        n_y_ids = len(y_id)
+        n_y_ids = len(self.y_id)
 
-        # TODO handle trace
-        if df.x_value:
+        if file_info.get('x_value'):
             df_type = 'point'
         else:
             if n_y_ids == 1:
@@ -134,6 +134,7 @@ class Folder(object):
     def x_values(self):
 
         x_id = self.x_id
+        dfs = self.dataframes
 
         x_values = []
         for i, info in enumerate(self.file_infos):
@@ -142,9 +143,9 @@ class Folder(object):
                 x_values.append(x_value)
             else:
                 if x_id == 'index':
-                    values = self.dfs[i].index.to_list()
+                    values = dfs[i].index.to_list()
                 else:
-                    values = self.dfs[i][x_id].to_list()
+                    values = dfs[i][x_id].to_list()
                 self.x.append({x_id: values})
 
         if len(x_values) > 0:
@@ -157,7 +158,7 @@ class Folder(object):
         y_id = self.y_id
         post = self.post
         post_keys = post.keys()
-
+        dfs = self.dataframes
 
         if isinstance(y_id, str):
             y_ids = [[y_id]]
@@ -167,24 +168,27 @@ class Folder(object):
             logging.error("y_id problem")
 
         y_values = []
-        for y_id in y_ids:
 
         for i, info in enumerate(self.file_infos):
 
             if info['df_type'] == 'point':
-                if 'avg' in post_keys:
-                    y_values.append()
+                for y_id in y_ids:
+                    # TODO implement more post process
+                    if 'avg' in post_keys:
+                        y_values.append(np.average(dfs[i][y_id]))
+                    else:
+                        y_values.append(dfs[i][y_id][0])  # take the 1st value in the column
             else:
-                if x_id == 'index':
-                    values = self.dfs[i].index.to_list()
-                else:
-                    values = self.dfs[i][x_id].to_list()
-                self.x.append({x_id: values})
+                traces = []
+                for y_id in y_ids:
+                    points = dfs[i][y_id].to_list()
+                    traces.append({y_id: points})
+                self.y.append(traces)
 
-        if len(x_values) > 0:
-            self.x.append({x_id:x_values})
+        if len(y_values) > 0:
+            self.y.append({y_id: y_values})
 
-        return self.x
+        return self.y
 
 
 

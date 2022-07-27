@@ -95,7 +95,9 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        folder_obj = Folder(directory, x_id, y_id, kwargs)
+        folder_data = Folder(directory, x_id, y_id, kwargs)
+        x = folder_data.x_values()
+        y = folder_data.y_values()
         # if loaded_data:
         #     # if not x:
         #     #     x, y = collect_from_pkl(directory, x_id, y_id)
