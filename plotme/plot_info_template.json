@@ -12,5 +12,13 @@
   },
   "pre": [{"remove_null": "all or y_id"}, {"remove_zero": "all or y_id"}],
   "post": [{"avg":  "all or y_id"}, {"max":  "all or y_id"}, {"min":  "all or y_id"}],
+  "constant_lines": {
+    "x=": [],
+    "y=": []
+  },
+   "error_y":{
+     "type":"percent",
+     "value":"change to floating point or integer",
+     "visible":true},
   "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
 }
