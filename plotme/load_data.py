@@ -40,6 +40,16 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
     return df
 
 
+def preprocessing(df, pre):
+    return_df = df
+    if pre[0]["remove_null"] == "all":
+        return_df = df.dropna()
+    if pre[1]["remove_zero"] == "all":
+        return_df = df.loc[(df!=0).all(axis=1)]
+    return return_df
+
+
+
 # def retrieve_x(filename, x_id, df, x_values, kwargs={}):
 #     name_significance = kwargs.get('name_significance', "None")
 #     # appends list for filename significance
@@ -67,6 +77,7 @@ class Folder(object):
         self.kwargs = kwargs
         self.x_id = x_id
         self.y_id = y_id
+        self.pre = kwargs.get('pre', {})
         self.post = kwargs.get('post', {})
 
         self.x = []  # list of dicts
@@ -90,6 +101,7 @@ class Folder(object):
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)
                 file_info['df_type'] = self.determine_df_type(df, file_info)
+                df = preprocessing(df, self.pre)
                 self.dataframes.append(df)
                 self.file_infos.append(file_info)
 
@@ -189,6 +201,8 @@ class Folder(object):
             self.y.append({y_id: y_values})
 
         return self.y
+    
+    
 
 
 
