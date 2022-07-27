@@ -61,28 +61,27 @@ def main(kwargs={}):
 def single_plot(kwargs={}):
 
     plot_dir = kwargs.get('plot_dir', Path.home())
+    template = kwargs.get('pio.template', "plotly_white")
+
     title = kwargs.get('title', 'plotme plot')
     x_id = kwargs.get('x_id', 'index')
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
     y_id = kwargs.get('y_id', 'headers')
     y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
 
-    split_on = kwargs.get('split_on', '_')  # used to split x_id out of file name
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
     constant_lines = kwargs.get('constant_lines', {})
-    constant_lines_x = constant_lines.get('x')  # list
-    constant_lines_y = constant_lines.get('y')  # list
-    add_line = True
-    error_bar_percent_of_y = 5
-    enable_error_bars = False
+    constant_lines_x = constant_lines.get('x=')  # list
+    constant_lines_y = constant_lines.get('y=')  # list
+    error_y = kwargs.get('error_y', {})
+    if error_y:
+        if not error_y.get('visible'):
+            error_y['visible'] = True
 
     folders = glob.glob(f"{plot_dir}/*/")
     folders.append(plot_dir)  # include the data_root directory
     x_dict = {}
-    if add_line:
-        y_dict = {'y=1': [1, 1]}
-    else:
-        y_dict = {}
+    y_dict = {}
     x_max = 0
     for folder in folders:
         directory = Path(folder)
@@ -104,18 +103,17 @@ def single_plot(kwargs={}):
             trace_x_id = list(x[0].keys())[0]
             trace_x_vals = x[0][trace_x_id]
             x_max = max(max(trace_x_vals), x_max)
-            x_dict.update(x[0])
+
             for trace in y[0]:
+                trace_y_id = list(trace.keys())[0]
                 y_dict.update(trace)
+                x_dict.update({trace_y_id: x[0][trace_x_id]})
 
         elif len(x) > 1:
             # TODO more than one graph per folder
             logging.info("multiple plots or multiple traces per file per folder not implemented")
 
-    if add_line:
-        x_dict['y=1'] = [0, x_max]
-
-    pio.templates.default = "plotly_white"
+    pio.templates.default = template
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True,
                         x_title=x_title, y_title=y_title)
 
@@ -125,11 +123,14 @@ def single_plot(kwargs={}):
         else:
             mode = 'markers'
         fig.add_trace(go.Scatter(name=folder, mode=mode, x=x_dict[folder], y=y_dict[folder], marker_symbol=i - 1,
-                                 error_y=dict(
-                                     type='percent',  # value of error bar given as percentage of y value
-                                     value=error_bar_percent_of_y,
-                                     visible=enable_error_bars)
+                                 error_y=error_y
                                  ), row=1, col=1)
+
+    for y_value in constant_lines_y:
+        fig.add_hline(y=y_value)
+
+    for x_value in constant_lines_x:
+        fig.add_vline(x=x_value)
 
     fig.update_layout(height=600, width=1000, title_text=title)
 
