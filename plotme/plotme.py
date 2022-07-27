@@ -61,6 +61,8 @@ def main(kwargs={}):
 def single_plot(kwargs={}):
 
     plot_dir = kwargs.get('plot_dir', Path.home())
+    template = kwargs.get('pio.template', "plotly_white")
+
     title = kwargs.get('title', 'plotme plot')
     x_id = kwargs.get('x_id', 'index')
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
@@ -111,7 +113,7 @@ def single_plot(kwargs={}):
             # TODO more than one graph per folder
             logging.info("multiple plots or multiple traces per file per folder not implemented")
 
-    pio.templates.default = "plotly_white"
+    pio.templates.default = template
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True,
                         x_title=x_title, y_title=y_title)
 

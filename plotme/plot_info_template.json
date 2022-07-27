@@ -20,5 +20,6 @@
      "type":"percent",
      "value":"change to floating point or integer",
      "visible":true},
+  "pio.template": "plotly_white, see readme for more examples",
   "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
 }
