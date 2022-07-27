@@ -36,8 +36,8 @@ def main(kwargs={}):
         dir_path = file.parent
 
         # hashing folder recursively
-        current_hash = dirhash(dir_path, "md5", ignore=["previous_hash", "*.html", "*.png"])
-        hash_file_path = Path(dir_path, "previous_hash")
+        current_hash = dirhash(dir_path, "md5", ignore=["*previous_hash", "*.html", "*.png"])
+        hash_file_path = Path(dir_path, f"{file.stem}_previous_hash")
         if hash_file_path.exists():
             with open(hash_file_path) as txt_file:
                 previous_hash = txt_file.read()
@@ -73,8 +73,8 @@ def single_plot(kwargs={}):
 
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
     constant_lines = kwargs.get('constant_lines', {})
-    constant_lines_x = constant_lines.get('x=')  # list
-    constant_lines_y = constant_lines.get('y=')  # list
+    constant_lines_x = constant_lines.get('x=', [])  # list
+    constant_lines_y = constant_lines.get('y=', [])  # list
     error_y = kwargs.get('error_y', {})
     if error_y:
         if not error_y.get('visible'):
