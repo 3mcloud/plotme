@@ -68,6 +68,8 @@ def single_plot(kwargs={}):
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
     y_id = kwargs.get('y_id', 'headers')
     y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
+    plot_type = kwargs.get('plot_type', 'scatter')
+
 
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
     constant_lines = kwargs.get('constant_lines', {})
