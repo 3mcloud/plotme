@@ -42,10 +42,11 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
 
 def preprocessing(df, pre):
     return_df = df
-    if pre[0]["remove_null"] == "all":
-        return_df = df.dropna()
-    if pre[1]["remove_zero"] == "all":
-        return_df = df.loc[(df!=0).all(axis=1)]
+    for conditions in pre:
+        if conditions["remove_null"] == "all":
+            return_df = df.dropna()
+        if conditions["remove_zero"] == "all":
+            return_df = df.loc[(df!=0).all(axis=1)]
     return return_df
 
 
