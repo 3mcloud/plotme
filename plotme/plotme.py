@@ -122,7 +122,7 @@ def single_plot(kwargs={}):
                         x_title=x_title, y_title=y_title)
 
     for i, folder in enumerate(x_dict, start=1):
-        if folder == 'y=1':
+        if plot_type == 'linear':
             mode = 'lines'
         else:
             mode = 'markers'
