@@ -98,12 +98,19 @@ def single_plot(kwargs={}):
         folder_data = Folder(directory, x_id, y_id, kwargs)
         x = folder_data.x_values()
         y = folder_data.y_values()
-        # if loaded_data:
-        #     # if not x:
-        #     #     x, y = collect_from_pkl(directory, x_id, y_id)
-        #     x_max = max(max(x), x_max)
-        #     x_dict.update({d_name_part: x})
-        #     y_dict.update({d_name_part: y})
+        if len(x) == 1:
+            # if not x:
+            #     x, y = collect_from_pkl(directory, x_id, y_id)
+            trace_x_id = list(x[0].keys())[0]
+            trace_x_vals = x[0][trace_x_id]
+            x_max = max(max(trace_x_vals), x_max)
+            x_dict.update(x[0])
+            for trace in y[0]:
+                y_dict.update(trace)
+
+        elif len(x) > 1:
+            # TODO more than one graph per folder
+            logging.info("multiple plots or multiple traces per file per folder not implemented")
 
     if add_line:
         x_dict['y=1'] = [0, x_max]
