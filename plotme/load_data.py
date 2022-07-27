@@ -174,7 +174,7 @@ class Folder(object):
         dfs = self.dataframes
 
         if isinstance(y_id, str):
-            y_ids = [[y_id]]
+            y_ids = [y_id]
         elif isinstance(y_id, list):
             y_ids = y_id
         else:
