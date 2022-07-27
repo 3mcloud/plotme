@@ -62,6 +62,8 @@ def single_plot(kwargs={}):
 
     plot_dir = kwargs.get('plot_dir', Path.home())
     template = kwargs.get('pio.template', "plotly_white")
+    height = kwargs.get('height', 600)
+    width = kwargs.get('width', 1000)
 
     title = kwargs.get('title', 'plotme plot')
     x_id = kwargs.get('x_id', 'index')
@@ -132,7 +134,7 @@ def single_plot(kwargs={}):
     for x_value in constant_lines_x:
         fig.add_vline(x=x_value)
 
-    fig.update_layout(height=600, width=1000, title_text=title)
+    fig.update_layout(height=height, width=width, title_text=title)
 
     fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
     # fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
