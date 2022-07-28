@@ -85,11 +85,15 @@ class Folder(object):
         self.y = []  # list of dicts
 
         schema = kwargs.get('schema', {})
-        file_extension = schema.get('file_extension', 'csv')
+        x_id_in_file_name = schema.get('x_id_in_file_name', False)
         index_col = schema.get('index_col')
-        x_id_in_file_name = kwargs.get('x_id_in_file_name', False)
-        match_string = str(Path(directory, f"*.{file_extension}"))
-        data_files = glob.glob(match_string, recursive=False)
+        file_extensions = schema.get('file_extension', ['csv', 'xlsx', 'xls'])
+        if isinstance(file_extensions, str):
+            file_extensions = [file_extensions]
+        data_files = []
+        for file_extension in file_extensions:
+            match_string = str(Path(directory, f"*.{file_extension}"))
+            data_files.extend(glob.glob(match_string, recursive=False))
         self.dataframes = []
         self.file_infos = []
         if len(data_files) == 0:
@@ -199,7 +203,7 @@ class Folder(object):
                 self.y.append(traces)
 
         if len(y_values) > 0:
-            self.y.append({y_id: y_values})
+            self.y.append([{y_id: y_values}])
 
         return self.y
     
