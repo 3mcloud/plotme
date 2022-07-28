@@ -2,6 +2,24 @@
 
 plot all the things in all the folders automatically but only if there have been changes
 
+## Features
+* scatter plot
+  * points
+  * lines
+* auto-detect data files
+* supported data files: xls, xlsx, csv
+* only re-generate plots if data or plot_info has changed
+* pre-process
+* post-process
+* specify data_root using argument or current directory
+
+### unimplimented ideas, in order of priority
+1. create executable
+1. use folder names 
+1. Hierarchical plot_info based on folder structure
+1. yml support
+1. plk data file support
+
 
 Templates configuration
 -----------------------
@@ -10,7 +28,6 @@ Templates configuration
         ['ggplot2', 'seaborn', 'simple_white', 'plotly',
          'plotly_white', 'plotly_dark', 'presentation', 'xgridoff',
          'ygridoff', 'gridon', 'none']
-
 
 
 ## Develop
