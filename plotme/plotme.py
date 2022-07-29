@@ -70,6 +70,8 @@ def single_plot(kwargs={}):
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
     y_id = kwargs.get('y_id', 'headers')
     y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
+    plot_mode = kwargs.get('trace_type', 'markers')
+
 
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
     constant_lines = kwargs.get('constant_lines', {})
@@ -120,7 +122,7 @@ def single_plot(kwargs={}):
                         x_title=x_title, y_title=y_title)
 
     for i, folder in enumerate(x_dict, start=1):
-        if folder == 'y=1':
+        if plot_mode == 'line':
             mode = 'lines'
         else:
             mode = 'markers'
