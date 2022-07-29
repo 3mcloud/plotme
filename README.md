@@ -19,7 +19,8 @@ plot all the things in all the folders automatically but only if there have been
 1. Hierarchical plot_info based on folder structure
 1. yml support
 1. plk data file support
-
+1. generate template from cli
+1. 3D plots
 
 Templates configuration
 -----------------------

@@ -4,9 +4,8 @@
   "x_id": "x column header name or name of parameter to be extracted from file name",
   "y_title": "label in plot, y_id used if unspecified",
   "y_id": ["list of column headers, single column header or column letter"],
-  "trace_type": "scatter, line, bar etc",
   "schema": {
-    "file_extension": "csv or xlsx",
+    "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
     "header": "row_n",
     "index_col": "int of index column, NULL or don't include if not used",
     "x_id_in_file_name": "true or false"
@@ -22,5 +21,7 @@
      "value":"change to floating point or integer",
      "visible":true},
   "pio.template": "plotly_white, see readme for more examples",
+  "trace_mode": "markers(default) or lines",
+  "marker_symbols": ["list of marker symbols numbers, must have one for each trace"],
   "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
 }

@@ -70,8 +70,8 @@ def single_plot(kwargs={}):
     x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
     y_id = kwargs.get('y_id', 'headers')
     y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
-    plot_mode = kwargs.get('trace_type', 'markers')
-
+    trace_mode = kwargs.get('trace_mode', 'markers')
+    marker_symbols = kwargs.get('marker_symbols')
 
     exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
     constant_lines = kwargs.get('constant_lines', {})
@@ -122,13 +122,13 @@ def single_plot(kwargs={}):
                         x_title=x_title, y_title=y_title)
 
     for i, folder in enumerate(x_dict, start=1):
-        if plot_mode == 'line':
-            mode = 'lines'
+        if isinstance(marker_symbols, list):
+            marker_symbol = marker_symbols[i - 1]
         else:
-            mode = 'markers'
-        fig.add_trace(go.Scatter(name=folder, mode=mode, x=x_dict[folder], y=y_dict[folder], marker_symbol=i - 1,
-                                 error_y=error_y
-                                 ), row=1, col=1)
+            marker_symbol = i - 1
+
+        fig.add_trace(go.Scatter(name=folder, mode=mode, x=x_dict[folder], y=y_dict[folder],
+                                 marker_symbol=marker_symbol, error_y=error_y), row=1, col=1)
 
     for y_value in constant_lines_y:
         fig.add_hline(y=y_value)
