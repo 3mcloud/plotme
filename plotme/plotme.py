@@ -127,7 +127,7 @@ def single_plot(kwargs={}):
         else:
             marker_symbol = i - 1
 
-        fig.add_trace(go.Scatter(name=folder, mode=mode, x=x_dict[folder], y=y_dict[folder],
+        fig.add_trace(go.Scatter(name=folder, mode=trace_mode, x=x_dict[folder], y=y_dict[folder],
                                  marker_symbol=marker_symbol, error_y=error_y), row=1, col=1)
 
     for y_value in constant_lines_y:
