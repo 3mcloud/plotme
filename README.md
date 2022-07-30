@@ -6,8 +6,8 @@ plot all the things in all the folders automatically but only if there have been
 * scatter plot
   * points
   * lines
-* auto-detect data files
-* supported data files: xls, xlsx, csv
+* auto-detect data files (xls, xlsx, csv only)
+* supported data files: xls, xlsx, csv, txt
 * only re-generate plots if data or plot_info has changed
 * pre-process
 * post-process

@@ -6,12 +6,13 @@
   "y_id": ["list of column headers, single column header or column letter"],
   "schema": {
     "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
-    "header": "row_n",
+    "seperator": ",(default)",
+    "header": "int",
     "index_col": "int of index column, NULL or don't include if not used",
     "x_id_in_file_name": "true or false"
   },
-  "pre": [{"remove_null": "all or y_id"}, {"remove_zero": "all or y_id"}],
-  "post": [{"avg":  "all or y_id"}, {"max":  "all or y_id"}, {"min":  "all or y_id"}],
+  "pre": ["remove_null", "remove_zero"],
+  "post": "avg, max or min",
   "constant_lines": {
     "x=": [],
     "y=": []

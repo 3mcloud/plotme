@@ -41,13 +41,14 @@ class Folder(object):
         self.kwargs = kwargs
         self.x_id = x_id
         self.y_id = y_id
-        self.pre = kwargs.get('pre', {})
-        self.post = kwargs.get('post', {})
+        self.pre = kwargs.get('pre', [])
+        self.post = kwargs.get('post')
 
         self.x = []  # list of dicts
         self.y = []  # list of dicts
 
         schema = kwargs.get('schema', {})
+        header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         index_col = schema.get('index_col')
         file_extensions = schema.get('file_extension', ['csv', 'xlsx', 'xls'])
@@ -65,7 +66,7 @@ class Folder(object):
         elif len(data_files) > 0:
             for file in data_files:  # read in all the dfs
                 file_info = {}
-                df = read(file, index_col=index_col)
+                df = read(file, index_col=index_col, header=header)
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)
                 file_info['df_type'] = self.determine_df_type(df, file_info)
