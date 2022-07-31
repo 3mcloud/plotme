@@ -6,9 +6,6 @@ import helper
 from plotme import __version__
 from plotme.plotting import plot_all
 
-
-helper.start_logging(log_level=logging.INFO)
-
 # parse the arguments
 parser = argparse.ArgumentParser(description='automates plotting of tabular data')
 
@@ -24,8 +21,10 @@ parser.add_argument('-v', dest='report_version', action="store_true",
 args_dict = vars(parser.parse_args())
 
 if args_dict['report_version']:
-    logging.info(f"plotme version: {__version__}")
+    print(f"plotme version: {__version__}")
     sys.exit(0)
+
+helper.start_logging(log_level=logging.INFO)
 
 try:
     plot_all(args_dict)
