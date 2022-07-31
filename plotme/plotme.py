@@ -16,6 +16,8 @@ import helper
 from load_data import Folder
 from schema import schema, template
 
+template_file_name = "must_rename_template_plot_info.json"
+
 
 def main(kwargs={}):
     """
@@ -37,11 +39,15 @@ def main(kwargs={}):
     # save template plot_info.json
     if len(plot_info_files) == 0 or kwargs.get('template'):
         template_stream = json.dumps(template, sort_keys=False, indent=4)
-        with open("template_plot_info.json", "w") as json_file:
+        with open(template_file_name, "w") as json_file:
             json_file.write(template_stream)
 
     for file in plot_info_files:
         dir_path = file.parent
+
+        # skip template_plot_info.json files
+        if file.stem in template_file_name:
+            continue
 
         # hashing folder recursively
         current_hash = dirhash(dir_path, "md5", ignore=["*previous_hash", "*.html", "*.png"])
@@ -69,9 +75,8 @@ def main(kwargs={}):
 
 
 def single_plot(kwargs={}):
-
     plot_dir = kwargs.get('plot_dir', Path.home())
-    template = kwargs.get('pio.template', "plotly_white")
+    pio_template = kwargs.get('pio.template', "plotly_white")
     height = kwargs.get('height', 600)
     width = kwargs.get('width', 1000)
 
@@ -127,7 +132,7 @@ def single_plot(kwargs={}):
             # TODO more than one graph per folder
             logging.info("multiple plots or multiple traces per file per folder not implemented")
 
-    pio.templates.default = template
+    pio.templates.default = pio_template
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True,
                         x_title=x_title, y_title=y_title)
 
