@@ -14,9 +14,13 @@ plot all the things in all the folders automatically but only if there have been
 * specify data_root using argument or current directory
 
 ## How to use
-* -h to see arguments
+* as python package: plotme -h to see arguments
+* as exe ... 
+* optional_text_plot_info.json (specification must end in plot_info.json)
+  * [pio.templates](https://plotly.com/python/templates/)
+  * [marker_symbols](https://plotly.com/python/marker-style/)
 
-### unimplimented ideas, in order of priority
+### unimplemented ideas, in order of priority
 1. create executable
 1. use folder names 
 1. Hierarchical plot_info based on folder structure
@@ -24,15 +28,6 @@ plot all the things in all the folders automatically but only if there have been
 1. plk data file support
 1. generate template from cli
 1. 3D plots
-
-Templates configuration
------------------------
-    Default template: 'plotly'
-    Available templates:
-        ['ggplot2', 'seaborn', 'simple_white', 'plotly',
-         'plotly_white', 'plotly_dark', 'presentation', 'xgridoff',
-         'ygridoff', 'gridon', 'none']
-
 
 ## Develop
 1. clone 
