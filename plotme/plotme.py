@@ -14,7 +14,7 @@ from plotly.subplots import make_subplots
 
 import helper
 from load_data import Folder
-from schema import schema
+from schema import schema, template
 
 
 def main(kwargs={}):
@@ -32,7 +32,14 @@ def main(kwargs={}):
     plot_info_file = kwargs.get('plot_info', 'plot_info.json')
 
     data_root = Path(kwargs.get('data_root', os.getcwd()))
-    plot_info_files = data_root.glob(f"**/*{plot_info_file}")
+    plot_info_files = list(data_root.glob(f"**/*{plot_info_file}"))
+
+    # save template plot_info.json
+    if len(plot_info_files) == 0 or kwargs.get('template'):
+        template_stream = json.dumps(template, sort_keys=False, indent=4)
+        with open("template_plot_info.json", "w") as json_file:
+            json_file.write(template_stream)
+
     for file in plot_info_files:
         dir_path = file.parent
 
