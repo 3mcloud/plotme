@@ -13,6 +13,9 @@ plot all the things in all the folders automatically but only if there have been
 * post-process
 * specify data_root using argument or current directory
 
+## How to use
+* -h to see arguments
+
 ### unimplimented ideas, in order of priority
 1. create executable
 1. use folder names 

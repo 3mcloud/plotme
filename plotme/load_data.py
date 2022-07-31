@@ -4,7 +4,6 @@ import logging
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 from read import read
 
@@ -119,7 +118,6 @@ class Folder(object):
 
         y_id = self.y_id
         post = self.post
-        post_keys = post.keys()
         dfs = self.dataframes
 
         if isinstance(y_id, str):
@@ -136,8 +134,12 @@ class Folder(object):
             if info['df_type'] == 'point':
                 for y_id in y_ids:
                     # TODO implement more post process
-                    if 'avg' in post_keys:
+                    if 'avg' == post:
                         y_values.append(np.average(dfs[i][y_id]))
+                    elif 'max' == post:
+                        y_values.append(np.maximum(dfs[i][y_id]))
+                    elif 'min' == post:
+                        y_values.append(np.minimum(dfs[i][y_id]))
                     else:
                         y_values.append(dfs[i][y_id][0])  # take the 1st value in the column
             else:

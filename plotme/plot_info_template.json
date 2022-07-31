@@ -23,6 +23,5 @@
      "visible":true},
   "pio.template": "plotly_white, see readme for more examples",
   "trace_mode": "markers(default) or lines",
-  "marker_symbols": ["list of marker symbols numbers, must have one for each trace"],
-  "parent_plot_info": "(unimplemented), name of parent plot before plot_info.json"
+  "marker_symbols": ["list of marker symbols numbers, must have one for each trace"]
 }

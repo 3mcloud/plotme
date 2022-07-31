@@ -3,17 +3,18 @@ import glob
 import json
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import plotly.graph_objects as go
 import plotly.io as pio
-
 from dirhash import dirhash
+from jsonschema import validate
 from plotly.subplots import make_subplots
 
 import helper
 from load_data import Folder
+from schema import schema
 
 
 def main(kwargs={}):
@@ -44,12 +45,14 @@ def main(kwargs={}):
         else:
             previous_hash = ''
 
-        if current_hash == previous_hash:
+        force = kwargs.get('force')
+        if current_hash == previous_hash and not force:
             logging.info(f"no changes detected, skipping {dir_path}")
         else:
             logging.info(f'loading plot settings from {file}')
             with open(file) as json_file:
                 plot_info = json.load(json_file)
+            validate(instance=plot_info, schema=schema)
             plot_info['plot_dir'] = dir_path
             single_plot(plot_info)
             with open(hash_file_path, "w+") as txt_file:
@@ -150,8 +153,10 @@ if __name__ == "__main__":
 
     parser.add_argument('-s', dest='data_root', action="store", default="", type=str,
                         help="Specify data directory")
-    parser.add_argument('-gt', action="store_true",
+    parser.add_argument('-gt', dest='template', action="store_true",
                         help="generate a template")
+    parser.add_argument('-f', dest='force', action="store_true",
+                        help="force regeneration of all plots")
 
     args = parser.parse_args()
 
