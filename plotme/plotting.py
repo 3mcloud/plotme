@@ -1,9 +1,7 @@
-import argparse
 import glob
 import json
 import logging
 import os
-import sys
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -12,14 +10,13 @@ from dirhash import dirhash
 from jsonschema import validate
 from plotly.subplots import make_subplots
 
-import helper
 from load_data import Folder
 from schema import schema, template
 
 template_file_name = "must_rename_template_plot_info.json"
 
 
-def main(kwargs={}):
+def plot_all(kwargs={}):
     """
     generate multiple plots, globs through data_root to find plot_info files, checks previous hash against current hash,
     runs single_plot
@@ -41,6 +38,7 @@ def main(kwargs={}):
         template_stream = json.dumps(template, sort_keys=False, indent=4)
         with open(template_file_name, "w") as json_file:
             json_file.write(template_stream)
+            logging.info("template plot_info file generated")
 
     for file in plot_info_files:
         dir_path = file.parent
@@ -156,27 +154,3 @@ def single_plot(kwargs={}):
     fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
     # fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
     fig.show()
-
-
-if __name__ == "__main__":
-
-    # parse the arguments
-    parser = argparse.ArgumentParser(description='automates plotting of tabular data')
-
-    parser.add_argument('-s', dest='data_root', action="store", default="", type=str,
-                        help="Specify data directory")
-    parser.add_argument('-gt', dest='template', action="store_true",
-                        help="generate a template")
-    parser.add_argument('-f', dest='force', action="store_true",
-                        help="force regeneration of all plots")
-
-    args = parser.parse_args()
-
-    helper.start_logging(log_level=logging.INFO)
-    try:
-        main(vars(args))
-        # single_plot()
-    except Exception as e:
-        logging.exception("Fatal error in main")
-        logging.error(e, exc_info=True)
-        sys.exit(1)

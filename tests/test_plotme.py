@@ -5,8 +5,8 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from plotme import plotme
-from plotme.plotme import template_file_name
+from plotme.plotting import plot_all
+from plotme.plotting import template_file_name
 
 
 def test_plotme():
@@ -20,7 +20,7 @@ def test_plotme():
     with open(test_spec_file, "w") as json_file:
         json_file.write(test_plot_info_stream)
 
-    ret = plotme.main()
+    ret = plot_all()
 
     os.remove(test_spec_file)
 
@@ -30,8 +30,9 @@ def test_plotme():
 def test_template_gen():
     # generate data
 
-    ret = plotme.main({"template": True})
+    ret = plot_all({"template": True})
 
     os.remove(template_file_name)
 
     assert ret == 0, "should return 0"
+
