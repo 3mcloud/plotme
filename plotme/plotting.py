@@ -66,7 +66,9 @@ def plot_all(args_dict={}):
                 plot_info = json.load(json_file)
             validate(instance=plot_info, schema=schema)
             plot_info['plot_dir'] = dir_path
-            single_plot(plot_info)
+            args_and_plot_info = args_dict.copy()
+            args_and_plot_info.update(plot_info)
+            single_plot(args_and_plot_info)  # plot_info can overwrite args
             with open(hash_file_path, "w+") as txt_file:
                 txt_file.write(current_hash)
 
