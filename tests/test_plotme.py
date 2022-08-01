@@ -20,9 +20,9 @@ def test_plotme():
     with open(test_spec_file, "w") as json_file:
         json_file.write(test_plot_info_stream)
 
-    ret = plot_all()
+    ret = plot_all({"force": True})
 
-    os.remove(test_spec_file)
+    # os.remove(test_spec_file)
 
     assert ret == 0, "should return 0"
 

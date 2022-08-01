@@ -47,9 +47,9 @@ plot all the things in all the folders automatically but only if there have been
 
 ## Build exe
 1. follow Develop instructions
-3. ```choco install visualstudio2019buildtools``` (needed to compile orderedset)
-4. ```pip install nuitka orderedset zstandard```
-6. ```python -m nuitka plotme --onefile --standalone --enable-plugin=numpy --enable-plugin=anti-bloat```
+2. ```choco install visualstudio2019buildtools``` (needed to compile orderedset)
+3. ```pip install nuitka orderedset zstandard```
+4. ```python -m nuitka plotme --onefile --standalone --enable-plugin=numpy --enable-plugin=anti-bloat --include-package=plotly --include-package-data=plotly```
 
 ## Test
 1. follow Develop instructions
