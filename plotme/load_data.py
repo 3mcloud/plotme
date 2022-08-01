@@ -35,18 +35,18 @@ def retrieve_x_from_name(filename, x_id):
 
 
 class Folder(object):
-    def __init__(self, directory, x_id='', y_id='', kwargs={}):
+    def __init__(self, directory, x_id='', y_id='', args_dict={}):
 
-        self.kwargs = kwargs
+        self.args_dict = args_dict
         self.x_id = x_id
         self.y_id = y_id
-        self.pre = kwargs.get('pre', [])
-        self.post = kwargs.get('post')
+        self.pre = args_dict.get('pre', [])
+        self.post = args_dict.get('post')
 
         self.x = []  # list of dicts
         self.y = []  # list of dicts
 
-        schema = kwargs.get('schema', {})
+        schema = args_dict.get('schema', {})
         header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         index_col = schema.get('index_col')

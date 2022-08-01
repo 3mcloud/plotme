@@ -16,25 +16,25 @@ from plotme.schema import schema, template
 template_file_name = "must_rename_template_plot_info.json"
 
 
-def plot_all(kwargs={}):
+def plot_all(args_dict={}):
     """
     generate multiple plots, globs through data_root to find plot_info files, checks previous hash against current hash,
     runs single_plot
 
     Parameters
     ----------
-    kwargs: dictionary
-        key word arguments
+    args_dict: dictionary
+        input arguments
 
     """
 
-    plot_info_file = kwargs.get('plot_info', 'plot_info.json')
+    plot_info_file = args_dict.get('plot_info', 'plot_info.json')
 
-    data_root = Path(kwargs.get('data_root', os.getcwd()))
+    data_root = Path(args_dict.get('data_root', os.getcwd()))
     plot_info_files = list(data_root.glob(f"**/*{plot_info_file}"))
 
     # save template plot_info.json
-    if len(plot_info_files) == 0 or kwargs.get('template'):
+    if len(plot_info_files) == 0 or args_dict.get('template'):
         template_stream = json.dumps(template, sort_keys=False, indent=4)
         with open(template_file_name, "w") as json_file:
             json_file.write(template_stream)
@@ -44,7 +44,8 @@ def plot_all(kwargs={}):
         dir_path = file.parent
 
         # skip template_plot_info.json files
-        if file.stem in template_file_name:
+        if template_file_name in str(file):
+            logging.info(f"ignoring {file} because it is probably a template")
             continue
 
         # hashing folder recursively
@@ -56,7 +57,7 @@ def plot_all(kwargs={}):
         else:
             previous_hash = ''
 
-        force = kwargs.get('force')
+        force = args_dict.get('force')
         if current_hash == previous_hash and not force:
             logging.info(f"no changes detected, skipping {dir_path}")
         else:
@@ -72,25 +73,25 @@ def plot_all(kwargs={}):
     return 0
 
 
-def single_plot(kwargs={}):
-    plot_dir = kwargs.get('plot_dir', Path.home())
-    pio_template = kwargs.get('pio.template', "plotly_white")
-    height = kwargs.get('height', 600)
-    width = kwargs.get('width', 1000)
+def single_plot(args_dict={}):
+    plot_dir = args_dict.get('plot_dir', Path.home())
+    pio_template = args_dict.get('pio.template', "plotly_white")
+    height = args_dict.get('height', 600)
+    width = args_dict.get('width', 1000)
 
-    title = kwargs.get('title', 'plotme plot')
-    x_id = kwargs.get('x_id', 'index')
-    x_title = kwargs.get('x_title', x_id)  # use x_id if no label is given
-    y_id = kwargs.get('y_id', 'headers')
-    y_title = kwargs.get('y_title', y_id)  # use y_id if no label is given
-    trace_mode = kwargs.get('trace_mode', 'markers')
-    marker_symbols = kwargs.get('marker_symbols')
+    title = args_dict.get('title', 'plotme plot')
+    x_id = args_dict.get('x_id', 'index')
+    x_title = args_dict.get('x_title', x_id)  # use x_id if no label is given
+    y_id = args_dict.get('y_id', 'headers')
+    y_title = args_dict.get('y_title', y_id)  # use y_id if no label is given
+    trace_mode = args_dict.get('trace_mode', 'markers')
+    marker_symbols = args_dict.get('marker_symbols')
 
-    exclude_from_trace_label = kwargs.get('exclude_from_trace_label', '')  # remove this
-    constant_lines = kwargs.get('constant_lines', {})
+    exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove this
+    constant_lines = args_dict.get('constant_lines', {})
     constant_lines_x = constant_lines.get('x=', [])  # list
     constant_lines_y = constant_lines.get('y=', [])  # list
-    error_y = kwargs.get('error_y', {})
+    error_y = args_dict.get('error_y', {})
     if error_y:
         if not error_y.get('visible'):
             error_y['visible'] = True
@@ -111,7 +112,7 @@ def single_plot(kwargs={}):
                 d_name_part = directory.name.strip(exclude_from_trace_label)
             else:
                 d_name_part = directory.name
-        folder_data = Folder(directory, x_id, y_id, kwargs)
+        folder_data = Folder(directory, x_id, y_id, args_dict)
         x = folder_data.x_values()
         y = folder_data.y_values()
         if len(x) == 1:
@@ -151,6 +152,9 @@ def single_plot(kwargs={}):
 
     fig.update_layout(height=height, width=width, title_text=title)
 
-    fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
-    # fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
-    fig.show()
+    if args_dict.get('html', True):
+        fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
+    if args_dict.get('png', False):
+        fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
+    if args_dict.get('show', True):
+        fig.show()

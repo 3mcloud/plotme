@@ -11,7 +11,7 @@ def run():
     # parse the arguments
     parser = argparse.ArgumentParser(description='automates plotting of tabular data')
 
-    parser.add_argument('-s', dest='data_root', action="store", default="", type=str,
+    parser.add_argument('-d', dest='data_root', action="store", default="", type=str,
                         help="Specify data directory")
     parser.add_argument('-gt', dest='template', action="store_true",
                         help="generate a template")
@@ -19,6 +19,12 @@ def run():
                         help="force regeneration of all plots")
     parser.add_argument('-v', dest='report_version', action="store_true",
                         help="report the version of plotme")
+    parser.add_argument('--no_html', dest='html', action="store_false",
+                        help="save .html file of each plot")
+    parser.add_argument('-p', dest='png', action="store_true",
+                        help="save .png file of each plot")
+    parser.add_argument('--quiet', dest='show', action="store_false",
+                        help="open each plot in a browser tab")
 
     args_dict = vars(parser.parse_args())
 
