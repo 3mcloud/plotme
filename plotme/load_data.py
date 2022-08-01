@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from read import read
+from plotme.read import read
 
 
 # this function should take plot_info and live in a different file or this python file should be changed

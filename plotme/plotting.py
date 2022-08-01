@@ -10,8 +10,8 @@ from dirhash import dirhash
 from jsonschema import validate
 from plotly.subplots import make_subplots
 
-from load_data import Folder
-from schema import schema, template
+from plotme.load_data import Folder
+from plotme.schema import schema, template
 
 template_file_name = "must_rename_template_plot_info.json"
 
