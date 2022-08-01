@@ -28,11 +28,13 @@ def run():
 
     args_dict = vars(parser.parse_args())
 
+    version_info = f"plotme version: {__version__}"
     if args_dict['report_version']:
-        print(f"plotme version: {__version__}")
+        print(version_info)
         sys.exit(0)
 
     helper.start_logging(log_level=logging.INFO)
+    logging.info(version_info)
 
     try:
         plot_all(args_dict)
