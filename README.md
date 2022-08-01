@@ -47,11 +47,9 @@ plot all the things in all the folders automatically but only if there have been
 
 ## Build exe
 1. follow Develop instructions
-2. ```pip install pyinstaller```
-3. ```pip uninstall numpy``` (pip numpy 1.23.1 didn't work with pyinstaller)
-4. ```conda install numpy```
-5. ```cd plotme```
-6. ```pyinstaller plotme.py --onefile```
+3. ```choco install visualstudio2019buildtools``` (needed to compile orderedset)
+4. ```pip install nuitka orderedset zstandard```
+6. ```python -m nuitka plotme --onefile --standalone --enable-plugin=numpy --enable-plugin=anti-bloat```
 
 ## Test
 1. follow Develop instructions
