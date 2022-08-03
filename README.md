@@ -4,9 +4,13 @@ plot all the things in all the folders automatically but only if there have been
 
 ## Features
 * save the plot's configuration/definition with the data (plot_info.json)
-* scatter plot
-  * markers
-  * lines
+* pass-through to plotly
+  * scatter plot
+    * mode (markers or lines)
+    * marker_symbols
+    * constant lines
+    * error bars
+  * pio.template
 * auto-detect data files (xls, xlsx, csv only)
 * supported data files: xls, xlsx, csv, txt
 * only re-generate plots if data or plot_info has changed, (-f to force re-generate)
@@ -14,6 +18,7 @@ plot all the things in all the folders automatically but only if there have been
 * post-process (max, min, avg)
 * specify data_root using argument or current directory
 * finds plot_info files at any depth in the folder tree
+* validation plot_info.json using jsonschema
 
 ### unimplemented ideas, in order of priority
 1. create better tests
