@@ -2,8 +2,8 @@
 kind: pipeline
 name: default
 steps:
-  - name: hello-world
+  - name: test
     image: base/python:alpine
     commands:
-      - env
-      - echo "Success!"
+      - pip install .[test]
+      - pytest -v --cov --cov-report term-missing
