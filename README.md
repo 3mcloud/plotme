@@ -25,8 +25,8 @@ plot all the things in all the folders automatically but only if there have been
 2. use folder/file name for default plot title
 3. Hierarchical plot_info based on folder structure
 4. yml support
-5. plk data file support
-7. 3D plots
+5. pkl data file support
+6. 3D plots
 
 ## Install
 * download exe from releases (windows only)
