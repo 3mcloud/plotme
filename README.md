@@ -31,8 +31,8 @@ plot all the things in all the folders automatically but only if there have been
 ## Install
 * download exe from releases (windows only)
 * install as module in a python environment: 
-  * SSH: ```python -m pip install git+ssh://git@github.mmm.com/MMM/plotme.git```
-  * HTTPS: ```python -m pip install https://github.mmm.com/MMM/plotme.git```
+  * SSH: ```python -m pip install git+ssh://git@github.com/3mcloud/plotme.git```
+  * HTTPS: ```python -m pip install https://github.com/3mcloud/plotme.git```
 
 ## How to use
 * from command line: plotme(.exe) -h to see arguments
