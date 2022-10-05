@@ -1,6 +1,7 @@
 schema = {
     "type": "object", "properties":
         {
+            "not_a_plot": {"type": "boolean"},
             "title_text": {"type": "string"},
             "x_title": {"type": "string"},
             "x_id": {"type": "string"},
@@ -49,8 +50,9 @@ schema = {
 }
 
 template = {
+    "not_a_plot": False,
     "title_text": "plot title",
-    "x_title": "label in plot, y_id used if unspecified",
+    "x_title": "label in plot, x_id used if unspecified",
     "x_id": "x column header name or name of parameter to be extracted from file name",
     "y_title": "label in plot, y_id used if unspecified",
     "y_id": ["list of column headers, single column header or column letter"],
