@@ -68,9 +68,11 @@ def plot_all(args_dict={}):
             plot_info['plot_dir'] = dir_path
             args_and_plot_info = args_dict.copy()
             args_and_plot_info.update(plot_info)
-            single_plot(args_and_plot_info)  # plot_info can overwrite args
-            with open(hash_file_path, "w+") as txt_file:
-                txt_file.write(current_hash)
+            not_a_plot = args_and_plot_info.get('not_a_plot', False)
+            if not_a_plot is False:
+                single_plot(args_and_plot_info)  # plot_info can overwrite args
+                with open(hash_file_path, "w+") as txt_file:
+                    txt_file.write(current_hash)
 
     return 0
 
@@ -81,7 +83,7 @@ def single_plot(args_dict={}):
     height = args_dict.get('height', 600)
     width = args_dict.get('width', 1000)
 
-    title = args_dict.get('title', 'plotme plot')
+    title = args_dict.get('title_text', 'plotme plot')
     x_id = args_dict.get('x_id', 'index')
     x_title = args_dict.get('x_title', x_id)  # use x_id if no label is given
     y_id = args_dict.get('y_id', 'headers')
