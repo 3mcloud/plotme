@@ -7,6 +7,9 @@ schema = {
             "x_id": {"type": "string"},
             "y_title": {"type": "string"},
             "y_id": {"type": ["array", "string"], "items": {"type": "string"}},
+            "showlegend": {"type": "boolean"},
+            "xaxes_visible": {"type": "boolean"},
+            "yaxes_visible": {"type": "boolean"},
             "schema": {"type": "object", "properties": {
                 "file_extension": {"type": "string", "enum": [
                     "csv",
@@ -56,6 +59,9 @@ template = {
     "x_id": "x column header name or name of parameter to be extracted from file name",
     "y_title": "label in plot, y_id used if unspecified",
     "y_id": ["list of column headers, single column header or column letter"],
+    "showlegend": True,
+    "xaxes_visible": True,
+    "yaxes_visible": True,
     "schema": {
         "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
         "seperator": ",(default)",

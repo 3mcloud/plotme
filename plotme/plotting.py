@@ -90,6 +90,9 @@ def single_plot(args_dict={}):
     y_title = args_dict.get('y_title', y_id)  # use y_id if no label is given
     trace_mode = args_dict.get('trace_mode', 'markers')
     marker_symbols = args_dict.get('marker_symbols')
+    show_legend = args_dict.get('showlegend', True)
+    x_axes_visible = args_dict.get('xaxes_visible', True)
+    y_axes_visible = args_dict.get('yaxes_visible', True)
 
     exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove this
     constant_lines = args_dict.get('constant_lines', {})
@@ -155,9 +158,12 @@ def single_plot(args_dict={}):
         fig.add_vline(x=x_value)
 
     fig.update_layout(height=height, width=width, title_text=title)
+    fig.update_layout(showlegend=show_legend)
+    fig.update_xaxes(visible=x_axes_visible)
+    fig.update_yaxes(visible=y_axes_visible)
 
     if args_dict.get('html', True):
-        fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")))
+        fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")), full_html=False, include_plotlyjs='cdn')
     if args_dict.get('png', False):
         fig.write_image(str(Path(plot_dir, f"{y_title} vs {x_title}.png")))
     if args_dict.get('show', True):
