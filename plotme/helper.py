@@ -1,6 +1,5 @@
-""" Copyright (c) 3M, 2020. All rights reserved.
-helper.py contains data related helper functions including import,
-verification, manipulation, logging, and upload used by roadrunner.py
+"""
+helper.py contains helper functions
 """
 import collections.abc
 import datetime as dt
