@@ -21,12 +21,14 @@ plot all the things in all the folders automatically but only if there have been
 * validation plot_info.json using jsonschema
 
 ### unimplemented ideas, in order of priority
+0. sign exe and add to releases
 1. create better tests
 2. use folder/file name for default plot title
 3. Hierarchical plot_info based on folder structure
 4. yml support
 5. pkl data file support
 6. 3D plots
+7. plot_info linter
 
 ## Install
 * download exe from releases (windows only)

@@ -25,6 +25,8 @@ def run():
                         help="save .png file of each plot")
     parser.add_argument('--quiet', dest='show', action="store_false",
                         help="open each plot in a browser tab")
+    parser.add_argument('--debug', dest='debug', action="store_true",
+                        help="enable debug logging")
 
     args_dict = vars(parser.parse_args())
 
@@ -33,7 +35,11 @@ def run():
         print(version_info)
         sys.exit(0)
 
-    helper.start_logging(log_level=logging.INFO)
+    if args_dict["debug"]:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.INFO
+    helper.start_logging(log_level=log_level)
     logging.info(version_info)
 
     try:
