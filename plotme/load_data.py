@@ -55,8 +55,12 @@ class Folder(object):
             file_extensions = [file_extensions]
         data_files = []
         for file_extension in file_extensions:
-            match_string = str(Path(directory, f"*.{file_extension}"))
-            data_files.extend(glob.glob(match_string, recursive=False))
+            # TODO rename file_extension or split into 2 variables
+            match_string = str(Path("**", f"*{file_extension}"))
+            ext_data = list(Path(directory).glob(match_string))
+            data_files.extend(ext_data)
+            logging.debug(f"{directory}'s match_string: {match_string}")
+        logging.debug(f"{directory}'s data_files: {data_files}")
         self.dataframes = []
         self.file_infos = []
         if len(data_files) == 0:
@@ -72,15 +76,18 @@ class Folder(object):
                 df = preprocessing(df, self.pre)
                 self.dataframes.append(df)
                 self.file_infos.append(file_info)
+            logging.debug(f"{file}: info: {file_info} data:{df}")
 
     def determine_df_type(self, df, file_info):
 
-        y_id = self.y_id
-        if isinstance(y_id, str):
-            if y_id == 'headers':
+        if isinstance(self.y_id, str):
+            if self.y_id == 'headers':
                 self.y_id = df.columns.to_list()
-
-        n_y_ids = len(self.y_id)
+        
+        if isinstance(self.y_id, list):
+            n_y_ids = len(self.y_id)
+        else:
+            n_y_ids = 1
 
         if file_info.get('x_value'):
             df_type = 'point'
