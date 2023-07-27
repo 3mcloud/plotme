@@ -11,16 +11,22 @@ schema = {
             "xaxes_visible": {"type": "boolean"},
             "yaxes_visible": {"type": "boolean"},
             "schema": {"type": "object", "properties": {
-                "file_extension": {"type": "string", "enum": [
-                    "csv",
-                    "txt",
-                    "xls",
-                    "xlsx"
-                ]},
+                "file_extension": {"type": "string"},
+                # "file_extension": {"type": "string", "enum": [
+                #     "csv",
+                #     "txt",
+                #     "xls",
+                #     "xlsx"
+                # ]},
                 "seperator": {"type": "string"},
                 "header": {"type": ["integer", "array", "null", "string"]},
                 "index_col": {"type": ["null", "integer"]},
                 "x_id_in_file_name": {"type": "boolean"},
+                "trace_label": {"type": "string", "enum": [
+                    "y_id",
+                    "folder_name",
+                    "file_name",
+                ]},
             }},
             "pre": {"type": "array", "items": {"type": "string", "enum": [
                 "remove_null",
@@ -53,7 +59,7 @@ schema = {
 }
 
 template = {
-    "not_a_plot": False,
+    # "not_a_plot": False,  # inheritance implemented yet
     "title_text": "plot title",
     "x_title": "label in plot, x_id used if unspecified",
     "x_id": "x column header name or name of parameter to be extracted from file name",
@@ -67,7 +73,8 @@ template = {
         "seperator": ",(default)",
         "header": "int",
         "index_col": "int of index column, NULL or don't include if not used",
-        "x_id_in_file_name": "true or false"
+        "x_id_in_file_name": "true or false",
+        "trace_label": "y_id(default), other options: folder_name or file_name"
     },
     "pre": ["remove_null", "remove_zero"],
     "post": "avg, max or min",

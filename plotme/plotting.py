@@ -94,6 +94,7 @@ def single_plot(args_dict={}):
     x_axes_visible = args_dict.get('xaxes_visible', True)
     y_axes_visible = args_dict.get('yaxes_visible', True)
 
+    trace_label = args_dict.get("schema", {}).get("trace_label", "y_id")
     exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove this
     constant_lines = args_dict.get('constant_lines', {})
     constant_lines_x = constant_lines.get('x=', [])  # list
@@ -122,21 +123,37 @@ def single_plot(args_dict={}):
         folder_data = Folder(directory, x_id, y_id, args_dict)
         x = folder_data.x_values()
         y = folder_data.y_values()
-        if len(x) == 1:
-            # if not x:
-            #     x, y = collect_from_pkl(directory, x_id, y_id)
-            trace_x_id = list(x[0].keys())[0]
-            trace_x_vals = x[0][trace_x_id]
-            x_max = max(max(trace_x_vals), x_max)
 
-            for trace in y[0]:
+        # if not x:
+        #     x, y = collect_from_pkl(directory, x_id, y_id)
+        trace_x_id = list(x[0].keys())[0]
+        trace_x_vals = x[0][trace_x_id]
+        x_max = max(max(trace_x_vals), x_max)
+        
+        # build the dicts to plot
+        for i, traces in enumerate(y):
+            # TODO auto trace_id is WIP
+            # determine trace_id automatically
+            # n_traces = len(traces)
+            # trace_y_ids = []
+            # for trace in traces:
+            #     trace_y_id = list(trace.keys())[0]
+            #     trace_y_ids.append(trace_y_id)
+            # n_trace_y_ids = len(list(set(trace_y_ids)))
+            # if n_traces > n_trace_y_ids:
+            #     use_dir_4trace = True
+            # else:
+            #     use_dir_4trace = False
+
+            for trace in traces:
                 trace_y_id = list(trace.keys())[0]
-                y_dict.update(trace)
-                x_dict.update({trace_y_id: x[0][trace_x_id]})
-
-        elif len(x) > 1:
-            # TODO more than one graph per folder
-            logging.info("multiple plots or multiple traces per file per folder not implemented")
+                if trace_label == "folder_name":
+                    trace_id = d_name_part
+                # TODO: implement file_name trace_label option
+                else:
+                    trace_id = trace_y_id
+                y_dict.update({trace_id: trace[trace_y_id]})
+                x_dict.update({trace_id: x[i][trace_x_id]})
 
     pio.templates.default = pio_template
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True,
