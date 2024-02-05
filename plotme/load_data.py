@@ -46,6 +46,8 @@ class Folder(object):
         self.x = []  # list of dicts
         self.y = []  # list of dicts
 
+        self.empty = True
+
         schema = args_dict.get('schema', {})
         header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
@@ -65,8 +67,8 @@ class Folder(object):
         self.file_infos = []
         if len(data_files) == 0:
             logging.debug(f"no data files found in {directory}")
-            return None
         elif len(data_files) > 0:
+            self.empty = False
             for file in data_files:  # read in all the dfs
                 file_info = {}
                 df = read(file, index_col=index_col, header=header)

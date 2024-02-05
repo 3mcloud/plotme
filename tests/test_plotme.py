@@ -36,3 +36,11 @@ def test_template_gen():
 
     assert ret == 0, "should return 0"
 
+
+def test_local_data():
+
+    os.chdir("D:\localData")
+
+    ret = plot_all({"force": True})
+
+    assert ret == 0, "should return 0"

@@ -121,6 +121,8 @@ def single_plot(args_dict={}):
             else:
                 d_name_part = directory.name
         folder_data = Folder(directory, x_id, y_id, args_dict)
+        if folder_data.empty:
+            continue
         x = folder_data.x_values()
         y = folder_data.y_values()
 
