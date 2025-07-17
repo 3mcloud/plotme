@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "plotme"
+dynamic = ["version"]
+description = "plot all the things in all the folders automatically but only if there have been changes"
+readme = "README.md"
+url = "https://github.mmm.com/3mcloud/plotme"
+authors = [
+  {name = "Milo Oien-Rochat", email = "nikolarobottesla@users.noreply.github.com"},
+  {name = "Daniel Garcia", email = "dgarcia7654@users.noreply.github.com"}
+]
+requires-python = ">=3.8"
+license = "LicenseRef-Proprietary"
+keywords = ["plotting", "data", "plotly", "cli"]
+dependencies = [
+  'dirhash',
+  'numpy',
+  'jsonschema',
+  'openpyxl',
+  'pandas',
+  'plotly',
+  'scandir',
+]
+
+[tool.hatch.version]
+path = "plotme/__init__.py"
+
+[project.scripts]
+plotme = "plotme.__main__:run"
