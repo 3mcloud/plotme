@@ -91,10 +91,12 @@ def single_plot(args_dict={}):
     trace_mode = args_dict.get('trace_mode', 'markers')
     marker_symbols = args_dict.get('marker_symbols')
     show_legend = args_dict.get('showlegend', True)
+    x_axes_kwargs = args_dict.get('x_axes_kwargs', {})
+    y_axes_kwargs = args_dict.get('y_axes_kwargs', {})
     x_axes_visible = args_dict.get('xaxes_visible', True)
     y_axes_visible = args_dict.get('yaxes_visible', True)
 
-    trace_label = args_dict.get("schema", {}).get("trace_label", "y_id")
+    trace_label = args_dict.get("schema", {}).get("trace_label", "file_name")
     exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove this
     constant_lines = args_dict.get('constant_lines', {})
     constant_lines_x = constant_lines.get('x=', [])  # list
@@ -106,54 +108,69 @@ def single_plot(args_dict={}):
 
     folders = glob.glob(f"{plot_dir}/*/")
     folders.append(plot_dir)  # include the data_root directory
-    x_dict = {}
-    y_dict = {}
-    x_max = 0
+
+    # remove folders empty, ignored or excluded
+    folder_datas = []
     for folder in folders:
         directory = Path(folder)
         if directory.name == 'ignore':
+            logging.info(f"ignoring {directory} because named 'ignore'")
             continue
+        # if the directory name doesn't include the exclude_from_trace_label skip it
+        # maybe this should be an option?
         if exclude_from_trace_label not in directory.name:
+            logging.info(f"ignoring {directory} because it does not match exclude_from_trace_label")
             continue
-        else:
-            if exclude_from_trace_label:
-                d_name_part = directory.name.strip(exclude_from_trace_label)
-            else:
-                d_name_part = directory.name
         folder_data = Folder(directory, x_id, y_id, args_dict)
         if folder_data.empty:
             continue
-        x = folder_data.x_values()
-        y = folder_data.y_values()
+        folder_datas.append(folder_data)
 
-        # if not x:
-        #     x, y = collect_from_pkl(directory, x_id, y_id)
+    # determine plot_source, plot_source used if df_type is 'trace' or 'point'
+    n_folder_datas = len(folder_datas)
+
+    x_dict = {}
+    y_dict = {}
+    for folder_data in folder_datas:
+        x = folder_data.x
+        y = folder_data.y
+        file_infos = folder_data.file_infos
+        
+        if exclude_from_trace_label:
+            d_name_part = folder_data.name.strip(exclude_from_trace_label)
+        else:
+            d_name_part = folder_data.name
+        
+        # assume all df_type in a folder are the same
+        df_type = file_infos[0]['df_type']
+
         trace_x_id = list(x[0].keys())[0]
-        trace_x_vals = x[0][trace_x_id]
-        x_max = max(max(trace_x_vals), x_max)
         
         # build the dicts to plot
         for i, traces in enumerate(y):
-            # TODO auto trace_id is WIP
-            # determine trace_id automatically
-            # n_traces = len(traces)
-            # trace_y_ids = []
-            # for trace in traces:
-            #     trace_y_id = list(trace.keys())[0]
-            #     trace_y_ids.append(trace_y_id)
-            # n_trace_y_ids = len(list(set(trace_y_ids)))
-            # if n_traces > n_trace_y_ids:
-            #     use_dir_4trace = True
-            # else:
-            #     use_dir_4trace = False
-
+            # this section of the code finds a unique trace_id for each trace
+            # the y data contains trace_y_id and for some cases the trace_id
+            num_traces = len(traces)
+            
+            #overwrite df_type because it is actually a plot
+            if num_traces == 1 and n_folder_datas == 1 and len(y) == 1:
+                df_type = 'plot'
+            
             for trace in traces:
                 trace_y_id = list(trace.keys())[0]
-                if trace_label == "folder_name":
-                    trace_id = d_name_part
-                # TODO: implement file_name trace_label option
-                else:
-                    trace_id = trace_y_id
+                match df_type:
+                    case 'plot':
+                        trace_id = trace_y_id
+                    case 'trace':
+                        if trace_label == 'file_name':
+                            trace_id = file_infos[i]['file_name']
+                        else:  # trace_label == 'folder_name'
+                            trace_id = d_name_part
+                    case 'point':
+                        trace_id = d_name_part
+                    case _:
+                        logging.error(f"Unexpected df_type: {df_type}")
+                    
                 y_dict.update({trace_id: trace[trace_y_id]})
                 x_dict.update({trace_id: x[i][trace_x_id]})
 
@@ -178,8 +195,8 @@ def single_plot(args_dict={}):
 
     fig.update_layout(height=height, width=width, title_text=title)
     fig.update_layout(showlegend=show_legend)
-    fig.update_xaxes(visible=x_axes_visible)
-    fig.update_yaxes(visible=y_axes_visible)
+    fig.update_xaxes(visible=x_axes_visible, **x_axes_kwargs)
+    fig.update_yaxes(visible=y_axes_visible, **y_axes_kwargs)
 
     if args_dict.get('html', True):
         fig.write_html(str(Path(plot_dir, f"{y_title} vs {x_title}.html")), full_html=False, include_plotlyjs='cdn')

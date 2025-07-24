@@ -39,7 +39,7 @@ def test_template_gen():
 
 def test_local_data():
 
-    os.chdir("D:\localData")
+    os.chdir(r"D:\localData")
 
     ret = plot_all({"force": True})
 

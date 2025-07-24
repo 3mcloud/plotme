@@ -19,13 +19,22 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
 
 
 def preprocessing(df, pre):
-    return_df = df
-    for conditions in pre:
-        if conditions["remove_null"] == "all":
-            return_df = df.dropna()
-        if conditions["remove_zero"] == "all":
-            return_df = df.loc[(df!=0).all(axis=1)]
-    return return_df
+    # use loop to sequence pre-processing steps
+    for step in pre:
+        match step:
+            case "remove_null":
+                df = df.dropna()
+            case "remove_zero":
+                df = df.loc[(df!=0).all(axis=1)]
+            case "remove_strings":
+                # Remove rows containing any string value
+                df = df.loc[df.map(lambda x: not isinstance(x, str)).all(axis=1)]
+            case "convert_to_float":
+                # Convert all cells in dataframe to float
+                df = df.astype(float)
+            case _:  # Default case (optional)
+                logging.warning(f"Unknown preprocessing step: {step}")
+    return df
 
 
 def retrieve_x_from_name(filename, x_id):
@@ -42,6 +51,7 @@ class Folder(object):
         self.y_id = y_id
         self.pre = args_dict.get('pre', [])
         self.post = args_dict.get('post')
+        self.name = Path(directory).name
 
         self.x = []  # list of dicts
         self.y = []  # list of dicts
@@ -58,19 +68,18 @@ class Folder(object):
         data_files = []
         for file_extension in file_extensions:
             # TODO rename file_extension or split into 2 variables
-            match_string = str(Path("**", f"*{file_extension}"))
+            match_string = str(Path(f"*{file_extension}"))
             ext_data = list(Path(directory).glob(match_string))
             data_files.extend(ext_data)
             logging.debug(f"{directory}'s match_string: {match_string}")
         logging.debug(f"{directory}'s data_files: {data_files}")
         self.dataframes = []
         self.file_infos = []
-        if len(data_files) == 0:
-            logging.debug(f"no data files found in {directory}")
-        elif len(data_files) > 0:
+        if len(data_files) > 0:
             self.empty = False
             for file in data_files:  # read in all the dfs
-                file_info = {}
+                file_name = Path(file).stem
+                file_info = {'file_name' : file_name}
                 df = read(file, index_col=index_col, header=header)
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)
@@ -78,7 +87,14 @@ class Folder(object):
                 df = preprocessing(df, self.pre)
                 self.dataframes.append(df)
                 self.file_infos.append(file_info)
-            logging.debug(f"{file}: info: {file_info} data:{df}")
+                logging.debug(f"{file}: info: {file_info} headers: {df.columns} "
+                            f"data: {df}")
+
+            self._x_values()
+            self._y_values()
+
+        else:
+            logging.debug(f"no data files found in {directory}")
 
     def determine_df_type(self, df, file_info):
 
@@ -101,7 +117,7 @@ class Folder(object):
 
         return df_type
 
-    def x_values(self):
+    def _x_values(self):
 
         x_id = self.x_id
         dfs = self.dataframes
@@ -123,7 +139,7 @@ class Folder(object):
 
         return self.x
 
-    def y_values(self):
+    def _y_values(self):
 
         y_id = self.y_id
         post = self.post

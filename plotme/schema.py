@@ -23,7 +23,7 @@ schema = {
                 "index_col": {"type": ["null", "integer"]},
                 "x_id_in_file_name": {"type": "boolean"},
                 "trace_label": {"type": "string", "enum": [
-                    "y_id",
+                    # "y_id",  # this shouldn't be needed anymore
                     "folder_name",
                     "file_name",
                 ]},
@@ -31,6 +31,8 @@ schema = {
             "pre": {"type": "array", "items": {"type": "string", "enum": [
                 "remove_null",
                 "remove_zero",
+                "remove_strings",
+                "convert_to_float",
             ]}},
             "post": {"type": "string", "enum": [
                 "avg",
@@ -71,12 +73,12 @@ template = {
     "schema": {
         "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
         "seperator": ",(default)",
-        "header": "int",
+        "header": "int row number(s) containing column labels and marking the start of the data (zero-indexed).",
         "index_col": "int of index column, NULL or don't include if not used",
         "x_id_in_file_name": "true or false",
-        "trace_label": "y_id(default), other options: folder_name or file_name"
+        "trace_label": "file_name(default), other options: folder_name"
     },
-    "pre": ["remove_null", "remove_zero"],
+    "pre": ["remove_null", "remove_zero", "remove_strings", "convert_to_float"],
     "post": "avg, max or min",
     "constant_lines": {
         "x=": [],
