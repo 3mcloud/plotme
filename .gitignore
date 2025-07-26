@@ -4,6 +4,11 @@
 *.xls
 *.json
 
+#generated files
+*.html
+*.png
+*_previous_hash
+
 #log files
 *.log
 tests/*.json

@@ -25,6 +25,11 @@ dependencies = [
   'scandir',
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
+
 [tool.hatch.version]
 path = "plotme/__init__.py"
 

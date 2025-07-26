@@ -1,9 +1,0 @@
----
-kind: pipeline
-name: default
-steps:
-  - name: test
-    image: base/python:alpine
-    commands:
-      - pip install .[test]
-      - pytest -v --cov --cov-report term-missing

@@ -14,7 +14,7 @@ from plotme.load_data import Folder
 from plotme.schema import schema, template
 
 template_file_name = "must_rename_template_plot_info.json"
-
+plot_info_id = "plot_info"
 
 def plot_all(args_dict={}):
     """
@@ -28,10 +28,10 @@ def plot_all(args_dict={}):
 
     """
 
-    plot_info_file = args_dict.get('plot_info', 'plot_info.json')
+    plot_info_file = args_dict.get('plot_info_file', plot_info_id)
 
     data_root = Path(args_dict.get('data_root', os.getcwd()))
-    plot_info_files = list(data_root.glob(f"**/*{plot_info_file}"))
+    plot_info_files = list(data_root.glob(f"**/*{plot_info_file}.json"))
 
     # save template plot_info.json
     if len(plot_info_files) == 0 or args_dict.get('template'):
@@ -39,13 +39,14 @@ def plot_all(args_dict={}):
         with open(template_file_name, "w") as json_file:
             json_file.write(template_stream)
             logging.info("template plot_info file generated")
+            return 0
 
     for file in plot_info_files:
         dir_path = file.parent
 
         # skip template_plot_info.json files
         if template_file_name in str(file):
-            logging.info(f"ignoring {file} because it is probably a template")
+            logging.info(f"ignoring {file} because the name matches the template file name")
             continue
 
         # hashing folder recursively
@@ -118,6 +119,7 @@ def single_plot(args_dict={}):
             continue
         # if the directory name doesn't include the exclude_from_trace_label skip it
         # maybe this should be an option?
+        # TODO should be fixed: currently assumes trace_label is a directory name and not a file name or y_id 
         if exclude_from_trace_label not in directory.name:
             logging.info(f"ignoring {directory} because it does not match exclude_from_trace_label")
             continue
@@ -163,7 +165,7 @@ def single_plot(args_dict={}):
                         trace_id = trace_y_id
                     case 'trace':
                         if trace_label == 'file_name':
-                            trace_id = file_infos[i]['file_name']
+                            trace_id = file_infos[i]['file_stem']
                         else:  # trace_label == 'folder_name'
                             trace_id = d_name_part
                     case 'point':

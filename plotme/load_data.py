@@ -59,6 +59,8 @@ class Folder(object):
         self.empty = True
 
         schema = args_dict.get('schema', {})
+        include_filter = schema.get('include_filter')
+        exclude_filter = schema.get('exclude_filter')
         header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         index_col = schema.get('index_col')
@@ -76,10 +78,17 @@ class Folder(object):
         self.dataframes = []
         self.file_infos = []
         if len(data_files) > 0:
-            self.empty = False
             for file in data_files:  # read in all the dfs
-                file_name = Path(file).stem
-                file_info = {'file_name' : file_name}
+                file_path = Path(file)
+                file_name = file_path.name
+                if include_filter and include_filter not in file_name:
+                    logging.info(f"ignoring {file} because it does not match include_filter")
+                    continue
+                if exclude_filter and exclude_filter in file_name:
+                    logging.info(f"ignoring {file} because it matches exclude_filter")
+                    continue
+                self.empty = False
+                file_info = {'file_stem' : file_path.stem}
                 df = read(file, index_col=index_col, header=header)
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)

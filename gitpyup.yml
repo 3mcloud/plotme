@@ -1,4 +1,4 @@
 shortcuts:
   - name: plotme
     target: powershell.exe
-    command: conda run -n plotme plotme
+    command: conda activate plotme

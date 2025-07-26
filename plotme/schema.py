@@ -11,6 +11,8 @@ schema = {
             "xaxes_visible": {"type": "boolean"},
             "yaxes_visible": {"type": "boolean"},
             "schema": {"type": "object", "properties": {
+                "include_filter": {"type": "string"},
+                "exclude_filter": {"type": "string"},
                 "file_extension": {"type": "string"},
                 # "file_extension": {"type": "string", "enum": [
                 #     "csv",
@@ -71,6 +73,8 @@ template = {
     "xaxes_visible": True,
     "yaxes_visible": True,
     "schema": {
+        "include_filter": "must be in data file name",
+        "exclude_filter": "must not be in data file name",
         "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
         "seperator": ",(default)",
         "header": "int row number(s) containing column labels and marking the start of the data (zero-indexed).",
