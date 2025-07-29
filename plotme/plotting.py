@@ -96,9 +96,11 @@ def single_plot(args_dict={}):
     y_axes_kwargs = args_dict.get('y_axes_kwargs', {})
     x_axes_visible = args_dict.get('xaxes_visible', True)
     y_axes_visible = args_dict.get('yaxes_visible', True)
+    include_filter = args_dict.get('folder_include_filter', '')
+    exclude_filter = args_dict.get('folder_exclude_filter', '')
 
     trace_label = args_dict.get("schema", {}).get("trace_label", "file_name")
-    exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove this
+    exclude_from_trace_label = args_dict.get('exclude_from_trace_label', '')  # remove or fix this
     constant_lines = args_dict.get('constant_lines', {})
     constant_lines_x = constant_lines.get('x=', [])  # list
     constant_lines_y = constant_lines.get('y=', [])  # list
@@ -107,7 +109,7 @@ def single_plot(args_dict={}):
         if not error_y.get('visible'):
             error_y['visible'] = True
 
-    folders = glob.glob(f"{plot_dir}/*/")
+    folders = glob.glob(f"{plot_dir}/**/", recursive=True)
     folders.append(plot_dir)  # include the data_root directory
 
     # remove folders empty, ignored or excluded
@@ -116,6 +118,12 @@ def single_plot(args_dict={}):
         directory = Path(folder)
         if directory.name == 'ignore':
             logging.info(f"ignoring {directory} because named 'ignore'")
+            continue
+        if include_filter and include_filter not in directory.name:
+            logging.info(f"ignoring {directory} because it does not match folder_include_filter")
+            continue
+        if exclude_filter and exclude_filter in directory.name:
+            logging.info(f"ignoring {directory} because it does match folder_exclude_filter")
             continue
         # if the directory name doesn't include the exclude_from_trace_label skip it
         # maybe this should be an option?
@@ -180,11 +188,11 @@ def single_plot(args_dict={}):
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True,
                         x_title=x_title, y_title=y_title)
 
-    for i, folder in enumerate(x_dict, start=1):
+    for i, folder in enumerate(x_dict):
         if isinstance(marker_symbols, list):
-            marker_symbol = marker_symbols[i - 1]
+            marker_symbol = marker_symbols[i]
         else:
-            marker_symbol = i - 1
+            marker_symbol = i % 55  # there are only 55 marker symbols in plotly
 
         fig.add_trace(go.Scatter(name=folder, mode=trace_mode, x=x_dict[folder], y=y_dict[folder],
                                  marker_symbol=marker_symbol, error_y=error_y), row=1, col=1)

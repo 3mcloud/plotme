@@ -1,11 +1,41 @@
 import glob
 import logging
+from difflib import get_close_matches
 
 from pathlib import Path
 
 import numpy as np
 
 from plotme.read import read
+
+
+def fuzzy_match_column(target_column, available_columns, cutoff=0.6):
+    """
+    Find the best fuzzy match for a target column name in available columns.
+    
+    Parameters:
+    -----------
+    target_column : str
+        The column name to search for
+    available_columns : list
+        List of available column names in the dataframe
+    cutoff : float
+        Minimum similarity ratio (0.0 to 1.0)
+    
+    Returns:
+    --------
+    str or None : Best matching column name, or None if no good match found
+    """
+    matches = get_close_matches(target_column, available_columns, n=1,
+                                cutoff=cutoff)
+    if matches:
+        best_match = matches[0]
+        if best_match != target_column:
+            logging.info(f"Fuzzy matched '{target_column}' to '{best_match}'")
+        return best_match
+    else:
+        logging.warning(f"No close match found for '{target_column}' columns")
+    return None
 
 
 # this function should take plot_info and live in a different file or this python file should be changed
@@ -59,8 +89,8 @@ class Folder(object):
         self.empty = True
 
         schema = args_dict.get('schema', {})
-        include_filter = schema.get('include_filter')
-        exclude_filter = schema.get('exclude_filter')
+        include_filter = schema.get('file_include_filter')
+        exclude_filter = schema.get('file_exclude_filter')
         header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         index_col = schema.get('index_col')
@@ -82,14 +112,32 @@ class Folder(object):
                 file_path = Path(file)
                 file_name = file_path.name
                 if include_filter and include_filter not in file_name:
-                    logging.info(f"ignoring {file} because it does not match include_filter")
+                    logging.info(f"ignoring {file} because it does not match file_include_filter")
                     continue
                 if exclude_filter and exclude_filter in file_name:
-                    logging.info(f"ignoring {file} because it matches exclude_filter")
+                    logging.info(f"ignoring {file} because it matches file_exclude_filter")
                     continue
-                self.empty = False
-                file_info = {'file_stem' : file_path.stem}
+                file_info = {'file_stem' : file_path.stem,
+                             'file_path': str(file_path)}
                 df = read(file, index_col=index_col, header=header)
+                
+                # if x_id or y_id not a columns header, try to fuzzy match it
+                # if matching doesn't work then skip the file
+                # TODO fix before commenting in, currently breaks tests
+                # if x_id not in df.columns:
+                #     logging.warning(f"x_id '{x_id}' not found in {file}")
+                #     # try to fuzzy match x_id
+                #     x_id_fuzz = fuzzy_match_column(df.columns, x_id)
+                #     if x_id_fuzz:
+                #         file_info['x_id_fuzz'] = x_id_fuzz
+                #     else:
+                #         continue
+                # TODO implement for y_id
+                # can be an array so fuzzy matching is more complex
+                
+                # only set folder as not empty if there is plotable data
+                self.empty = False
+                
                 if x_id_in_file_name:  # if true this also means the df is for a single point!
                     file_info['x_value'] = retrieve_x_from_name(file, x_id)
                 file_info['df_type'] = self.determine_df_type(df, file_info)
@@ -99,8 +147,13 @@ class Folder(object):
                 logging.debug(f"{file}: info: {file_info} headers: {df.columns} "
                             f"data: {df}")
 
-            self._x_values()
-            self._y_values()
+            # handle folder data errors
+            try:
+                self._x_values()
+                self._y_values()
+            except Exception as e:
+                logging.error(f"Error processing folder {directory}: {e}")
+                self.empty = True
 
         else:
             logging.debug(f"no data files found in {directory}")
@@ -128,25 +181,23 @@ class Folder(object):
 
     def _x_values(self):
 
-        x_id = self.x_id
         dfs = self.dataframes
 
         x_values = []
         for i, info in enumerate(self.file_infos):
+            x_id = info.get('x_id_fuzz', self.x_id)
             x_value = info.get('x_value')
             if x_value:
                 x_values.append(x_value)
             else:
-                if x_id == 'index':
+                if self.x_id == 'index':
                     values = dfs[i].index.to_list()
                 else:
                     values = dfs[i][x_id].to_list()
-                self.x.append({x_id: values})
+                self.x.append({self.x_id: values})
 
         if len(x_values) > 0:
-            self.x.append({x_id:x_values})
-
-        return self.x
+            self.x.append({self.x_id: x_values})
 
     def _y_values(self):
 
@@ -164,7 +215,6 @@ class Folder(object):
         y_values = []
 
         for i, info in enumerate(self.file_infos):
-
             if info['df_type'] == 'point':
                 for y_id in y_ids:
                     # TODO implement more post process
@@ -185,5 +235,3 @@ class Folder(object):
 
         if len(y_values) > 0:
             self.y.append([{y_id: y_values}])
-
-        return self.y

@@ -10,9 +10,11 @@ schema = {
             "showlegend": {"type": "boolean"},
             "xaxes_visible": {"type": "boolean"},
             "yaxes_visible": {"type": "boolean"},
+            "folder_include_filter": {"type": "string"},
+            "folder_exclude_filter": {"type": "string"},
             "schema": {"type": "object", "properties": {
-                "include_filter": {"type": "string"},
-                "exclude_filter": {"type": "string"},
+                "file_include_filter": {"type": "string"},
+                "file_exclude_filter": {"type": "string"},
                 "file_extension": {"type": "string"},
                 # "file_extension": {"type": "string", "enum": [
                 #     "csv",
@@ -72,9 +74,11 @@ template = {
     "showlegend": True,
     "xaxes_visible": True,
     "yaxes_visible": True,
+    "folder_include_filter": "must be in the folder name",
+    "folder_exclude_filter": "must not be in the folder name",
     "schema": {
-        "include_filter": "must be in data file name",
-        "exclude_filter": "must not be in data file name",
+        "file_include_filter": "must be in data file name",
+        "file_exclude_filter": "must not be in data file name",
         "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
         "seperator": ",(default)",
         "header": "int row number(s) containing column labels and marking the start of the data (zero-indexed).",

@@ -26,7 +26,7 @@ def test_simple_random_data():
     test_plot_info = {
         "title_text": "simple random data",
         "schema": {
-            "include_filter": data_file_name,
+            "file_include_filter": data_file_name,
         },
     }
     test_plot_info_stream = json.dumps(test_plot_info, sort_keys=False, indent=4)

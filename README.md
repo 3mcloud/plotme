@@ -17,6 +17,7 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
 * auto-detect data files (xls, xlsx, csv only)
 * supported data files: xls, xlsx, csv, txt
 * filter data files (include and exclude)
+* filter folders (include and exclude)
 * only re-generate plots if data or plot_info has changed, (-f to force re-generate)
 * pre-process
 * post-process (max, min, avg)
