@@ -50,7 +50,7 @@ def plot_all(args_dict={}):
             continue
 
         # hashing folder recursively
-        current_hash = dirhash(dir_path, "md5", ignore=["*previous_hash", "*.html", "*.png"])
+        current_hash = dirhash(dir_path, "md5", ignore=["*previous_hash", "*.html", "*.png", "*.log"])
         hash_file_path = Path(dir_path, f"{file.stem}_previous_hash")
         if hash_file_path.exists():
             with open(hash_file_path) as txt_file:
