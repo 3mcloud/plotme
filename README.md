@@ -5,7 +5,10 @@ scatter plot all the things in all the folders automatically but only if there h
 Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It is a command line tool written in python. It uses json files to configure the plots. It is for technical and non-techncial folks.
 
 ## Features
+* specify data_root using argument or current directory
 * save the plot's configuration/definition with the data (plot_info.json)
+* finds plot_info files at any depth in the folder tree
+* validation plot_info.json using jsonschema
 * pass-through to plotly
   * scatter plot
     * mode (markers or lines)
@@ -16,14 +19,15 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
   * [pio.templates](https://plotly.com/python/templates/)
 * auto-detect data files (xls, xlsx, csv only)
 * supported data files: xls, xlsx, csv, txt
-* filter data files (include and exclude)
-* filter folders (include and exclude)
-* only re-generate plots if data or plot_info has changed, (-f to force re-generate)
-* pre-process
-* post-process (max, min, avg)
-* specify data_root using argument or current directory
-* finds plot_info files at any depth in the folder tree
-* validation plot_info.json using jsonschema
+* filter data files (include and exclude) `folder_include_filter`, `folder_exclude_filter`, 
+* filter folders (include and exclude) `file_include_filter`, `file_exclude_filter`, 
+* trace label from y_id (when plot is single file) or file name (default) or folder name `trace_label`
+* remove common text from all trace labels `remove_from_trace_label`
+* only re-generate plots if data or plot_info has changed, to force regeneration `plotme -f`
+* pre-process `pre`
+* post-process (max, min, avg) `post`
+* x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
+* extract x value from filename using regular expression `x_id_is_reg_exp`
 
 ## Install options
 * download exe from releases (windows only)
@@ -46,12 +50,11 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
 ### unimplemented ideas, in order of priority
 0. sign exe and add to releases
 1. create better tests
-2. use folder/file name for default plot title
-3. Hierarchical plot_info based on folder structure
-4. yml support
-5. pkl data file support
-6. 3D plots
-7. plot_info linter
+2. Hierarchical plot_info based on folder structure
+3. yml support
+4. pkl data file support
+5. 3D plots
+6. plot_info linter
 
 ### Develop
 1. clone 

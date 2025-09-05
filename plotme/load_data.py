@@ -1,7 +1,8 @@
-import glob
 import logging
-from difflib import get_close_matches
+import re
 
+from difflib import get_close_matches
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -67,10 +68,41 @@ def preprocessing(df, pre):
     return df
 
 
-def retrieve_x_from_name(filename, x_id):
-    x_value = Path(filename).stem.split(x_id)[1].split(x_id)[0]
-    x_value = float(x_value)
-    return x_value
+def check_filter_match(filter_value, filename):
+    """
+    Check if filename matches any filter criteria.
+    
+    Parameters:
+    -----------
+    filter_value : str or iterable
+        Filter criteria - can be a single string or an iterable of strings
+    filename : str
+        The filename to check against the filter
+        
+    Returns:
+    --------
+    bool : True if any filter matches, False otherwise
+    """
+    if filter_value is None:
+        return False
+    
+    # Convert string to list for uniform processing
+    if isinstance(filter_value, str):
+        filters = [filter_value]
+    else:
+        # Handle any iterable (list, tuple, set, etc.)
+        try:
+            filters = list(filter_value)
+        except TypeError:
+            # If it's not iterable, treat as single string
+            filters = [str(filter_value)]
+    
+    # Check if any filter matches the filename
+    for filter_item in filters:
+        if filter_item in filename:
+            return True
+    
+    return False
 
 
 class Folder(object):
@@ -88,11 +120,12 @@ class Folder(object):
 
         self.empty = True
 
-        schema = args_dict.get('schema', {})
+        self.schema = schema = args_dict.get('schema', {})
         include_filter = schema.get('file_include_filter')
         exclude_filter = schema.get('file_exclude_filter')
         header = schema.get('header', 'infer')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
+        x_id_is_reg_exp = schema.get('x_id_is_reg_exp', False)
         index_col = schema.get('index_col')
         file_extensions = schema.get('file_extension', ['csv', 'xlsx', 'xls'])
         if isinstance(file_extensions, str):
@@ -111,10 +144,10 @@ class Folder(object):
             for file in data_files:  # read in all the dfs
                 file_path = Path(file)
                 file_name = file_path.name
-                if include_filter and include_filter not in file_name:
+                if include_filter and not check_filter_match(include_filter, file_name):
                     logging.info(f"ignoring {file} because it does not match file_include_filter")
                     continue
-                if exclude_filter and exclude_filter in file_name:
+                if exclude_filter and check_filter_match(exclude_filter, file_name):
                     logging.info(f"ignoring {file} because it matches file_exclude_filter")
                     continue
                 file_info = {'file_stem' : file_path.stem,
@@ -138,9 +171,9 @@ class Folder(object):
                 # only set folder as not empty if there is plotable data
                 self.empty = False
                 
-                if x_id_in_file_name:  # if true this also means the df is for a single point!
-                    file_info['x_value'] = retrieve_x_from_name(file, x_id)
-                file_info['df_type'] = self.determine_df_type(df, file_info)
+                if x_id_in_file_name or x_id_is_reg_exp:  # if true the df_type is point
+                    file_info['x_value'] = self._retrieve_x_from_name(file)
+                file_info['df_type'] = self._determine_df_type(df, file_info)
                 df = preprocessing(df, self.pre)
                 self.dataframes.append(df)
                 self.file_infos.append(file_info)
@@ -152,13 +185,41 @@ class Folder(object):
                 self._x_values()
                 self._y_values()
             except Exception as e:
-                logging.error(f"Error processing folder {directory}: {e}")
+                logging.error(e, exc_info=True)
+                logging.error(f"Above error processing folder {directory}")
                 self.empty = True
 
         else:
             logging.debug(f"no data files found in {directory}")
 
-    def determine_df_type(self, df, file_info):
+    def _retrieve_x_from_name(self, filename):
+        x_id = self.x_id
+        x_time_format = self.schema.get('x_time_format', None)
+
+        if self.schema.get('x_id_is_reg_exp', False):
+            # x_id contains regular expression, use it to find 
+            # example x_id: "_(\\d+)N"
+            extracted = re.search(x_id, Path(filename).stem)
+            if extracted:
+                extracted = extracted.group(1)
+            else:
+                logging.warning(f"x_id '{x_id}' not found in filename '{filename}'")
+                return None
+        else:
+            extracted = Path(filename).stem.split(x_id)[1].split(x_id)[0]
+
+        if x_time_format is not None:
+            time_stamp = datetime.strptime(extracted, x_time_format).timestamp()
+            if self.args_dict.get('min_timestamp') is None:
+                self.args_dict['min_timestamp'] = time_stamp
+                x_value = 0
+            else:
+                x_value = time_stamp - self.args_dict['min_timestamp']
+        else:
+            x_value = float(extracted)
+        return x_value
+
+    def _determine_df_type(self, df, file_info):
 
         if isinstance(self.y_id, str):
             if self.y_id == 'headers':
@@ -169,7 +230,7 @@ class Folder(object):
         else:
             n_y_ids = 1
 
-        if file_info.get('x_value'):
+        if 'x_value' in file_info:
             df_type = 'point'
         else:
             if n_y_ids == 1:
@@ -186,8 +247,8 @@ class Folder(object):
         x_values = []
         for i, info in enumerate(self.file_infos):
             x_id = info.get('x_id_fuzz', self.x_id)
-            x_value = info.get('x_value')
-            if x_value:
+            x_value = info.get('x_value', None)
+            if x_value is not None:
                 x_values.append(x_value)
             else:
                 if self.x_id == 'index':
@@ -221,9 +282,9 @@ class Folder(object):
                     if 'avg' == post:
                         y_values.append(np.average(dfs[i][y_id]))
                     elif 'max' == post:
-                        y_values.append(np.maximum(dfs[i][y_id]))
+                        y_values.append(np.max(dfs[i][y_id]))
                     elif 'min' == post:
-                        y_values.append(np.minimum(dfs[i][y_id]))
+                        y_values.append(np.min(dfs[i][y_id]))
                     else:
                         y_values.append(dfs[i][y_id][0])  # take the 1st value in the column
             else:
