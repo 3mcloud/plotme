@@ -2,13 +2,13 @@
 scatter plot all the things in all the folders automatically but only if there have been changes
 
 ## Description
-Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It is a command line tool written in python. It uses json files to configure the plots. It is for technical and non-techncial folks.
+Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It is a command line tool written in python. It uses json or yaml files to configure the plots. It is for technical and non-techncial folks.
 
 ## Features
 * specify data_root using argument or current directory
 * save the plot's configuration/definition with the data (plot_info.json)
 * finds plot_info files at any depth in the folder tree
-* validation plot_info.json using jsonschema
+* validation plot_info.json/yml/yaml using jsonschema
 * pass-through to plotly
   * scatter plot
     * `trace_mode` (markers or lines) 
@@ -92,10 +92,9 @@ in this example
 0. sign exe and add to releases
 1. create better tests
 2. Hierarchical plot_info based on folder structure
-3. yml support
-4. pkl data file support
-5. 3D plots
-6. plot_info linter
+3. pkl data file support
+4. 3D plots
+5. plot_info linter
 
 ### Develop
 1. clone 

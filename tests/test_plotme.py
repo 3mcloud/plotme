@@ -4,6 +4,7 @@ import os
 import pytest
 import numpy as np
 import pandas as pd
+import yaml
 
 from plotme.plotting import plot_all
 from plotme.plotting import template_file_name
@@ -60,6 +61,32 @@ def test_housing_data():
     ret = plot_all({"force": True, "data_root": data_root})
 
     assert ret == 0, "should return 0"
+
+
+def test_yaml_plot_info():
+    init_test()
+    df = pd.DataFrame(np.random.randn(100, 4), columns=list('ABCD'))
+    data_file_name = "random_yaml_test.csv"
+    df.to_csv(data_file_name)
+    test_plot_info = {
+        "title_text": "yaml random data",
+        "schema": {
+            "file_include_filter": data_file_name,
+        },
+    }
+    plot_info_filter = "yaml_random_data"
+    for ext in ("yaml", "yml"):
+        test_spec_file = f"{plot_info_filter}.{ext}"
+        with open(test_spec_file, "w") as yaml_file:
+            yaml.dump(test_plot_info, yaml_file)
+
+        ret = plot_all({"force": True, "plot_info_file": plot_info_filter})
+
+        os.remove(test_spec_file)
+        assert ret == 0, f"should return 0 for .{ext} plot_info file"
+
+    os.remove(data_file_name)
+
 
 def test_local_data():
 
