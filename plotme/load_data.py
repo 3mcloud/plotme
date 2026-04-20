@@ -134,7 +134,7 @@ class Folder(object):
         for file_extension in file_extensions:
             # TODO rename file_extension or split into 2 variables
             match_string = str(Path(f"*{file_extension}"))
-            ext_data = list(Path(directory).glob(match_string))
+            ext_data = list(Path(directory).glob(match_string, case_sensitive=False))
             data_files.extend(ext_data)
             logging.debug(f"{directory}'s match_string: {match_string}")
         logging.debug(f"{directory}'s data_files: {data_files}")
