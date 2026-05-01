@@ -38,11 +38,18 @@ schema = {
                 ]},
                 "remove_from_trace_label": {"type": "string"},
             }},
-            "pre": {"type": "array", "items": {"type": "string", "enum": [
-                "remove_null",
-                "remove_zero",
-                "remove_strings",
-                "convert_to_float",
+            "pre": {"type": "array", "items": {"oneOf": [
+                {"type": "string", "enum": [
+                    "remove_null",
+                    "remove_zero",
+                    "remove_strings",
+                    "convert_to_float",
+                ]},
+                {"type": "object", "properties": {
+                    "slice_start": {"type": "integer"},
+                    "slice_end": {"type": "integer"},
+                    "slice_step": {"type": "integer"},
+                }}
             ]}},
             "post": {"type": "string", "enum": [
                 "avg",
@@ -95,7 +102,13 @@ template = {
         "trace_label": "file_name(default), other options: folder_name",
         "remove_from_trace_label": "string to remove from trace labels"
     },
-    "pre": ["remove_null", "remove_zero", "remove_strings", "convert_to_float"],
+    "pre": ["remove_null",
+            "remove_zero",
+            "remove_strings",
+            "convert_to_float",
+            {"slice_start": 0},
+            {"slice_end": "length of data by default"},
+            {"slice_step": 1}],
     "post": "avg, max or min",
     "constant_lines": {
         "x=": [],

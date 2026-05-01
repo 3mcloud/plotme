@@ -50,6 +50,10 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
 
 
 def preprocessing(df, pre):
+    start = 0
+    end = len(df)
+    step = 1
+
     # use loop to sequence pre-processing steps
     for step in pre:
         match step:
@@ -63,8 +67,17 @@ def preprocessing(df, pre):
             case "convert_to_float":
                 # Convert all cells in dataframe to float
                 df = df.astype(float)
+            case {"slice_start": value}:
+                start = int(value)
+            case {"slice_end": value}:
+                end = int(value)
+            case {"slice_step": value}:
+                step = int(value)
             case _:  # Default case (optional)
                 logging.warning(f"Unknown preprocessing step: {step}")
+    
+    if start != 0 or end != len(df) or step != 1:
+        df = df.iloc[start:end:step]
     return df
 
 
