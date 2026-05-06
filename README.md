@@ -20,14 +20,17 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
   * `update_layout_kwargs` plotly layout keyword arguments e.g. 'font', 'legend' etc
   * `update_traces_kwargs` plotly traces keyword arguments e.g. 'marker', 'selector' etc
 * auto-detect data files (xls, xlsx, csv only)
-* supported data files: xls, xlsx, csv, txt
+* supported data files: xls, xlsx, csv, txt, and any text file readable by pandas.read_csv()
+* Pass `header` `separator`, `index_col` and any other kwargs using `pandas_read_kwargs` [read_csv()](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html) [read_excel()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html)
 * filter data files (include and exclude) `folder_include_filter`, `folder_exclude_filter`, 
 * filter folders (include and exclude) `file_include_filter`, `file_exclude_filter`, 
 * trace label from y_id (when plot is single file) or file name (default) or folder name `trace_label`
 * remove common text from all trace labels `remove_from_trace_label`
 * only re-generate plots if data or plot_info has changed, to force regeneration `plotme -f`
-* pre-process `pre`
-* post-process (max, min, avg) `post`
+* pre-process `pre` options
+  * data cleaning: `remove_null`, `remove_zero`, `remove_strings`, `convert_to_float`
+  * slice: `slice_start`, `slice_end`, `slice_step`
+* post-process `post` (`max`, `min`, `avg`)
 * x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
 * extract x value from filename using regular expression `x_id_is_reg_exp`
 
@@ -111,5 +114,5 @@ in this example
 
 ### Test
 1. follow Develop instructions
-2. Install packages to run automated tests `python -m pip install -e .[test]`
+2. Install packages to run automated tests `python -m pip install -e '.[test]'` or `pipx install -e '.[test]' -f`
 1. run tests

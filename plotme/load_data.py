@@ -54,9 +54,9 @@ def preprocessing(df, pre):
     end = len(df)
     step = 1
 
-    # use loop to sequence pre-processing steps
-    for step in pre:
-        match step:
+    # use loop to sequence pre-processing items
+    for item in pre:
+        match item:
             case "remove_null":
                 df = df.dropna()
             case "remove_zero":
@@ -69,12 +69,15 @@ def preprocessing(df, pre):
                 df = df.astype(float)
             case {"slice_start": value}:
                 start = int(value)
+                logging.debug(f"slice_start set to {start}")
             case {"slice_end": value}:
                 end = int(value)
+                logging.debug(f"slice_end set to {end}")
             case {"slice_step": value}:
                 step = int(value)
+                logging.debug(f"slice_step set to {step}")
             case _:  # Default case (optional)
-                logging.warning(f"Unknown preprocessing step: {step}")
+                logging.warning(f"Unknown preprocessing: {item}")
     
     if start != 0 or end != len(df) or step != 1:
         df = df.iloc[start:end:step]
@@ -136,10 +139,16 @@ class Folder(object):
         self.schema = schema = args_dict.get('schema', {})
         include_filter = schema.get('file_include_filter')
         exclude_filter = schema.get('file_exclude_filter')
-        header = schema.get('header', 'infer')
+        # build read_kwargs
+        read_kwargs = schema.get('pandas_read_kwargs', {})
+        if schema.get('header'):
+            read_kwargs['header'] = schema.get('header')
+        if schema.get('separator'):
+            read_kwargs['sep'] = schema.get('separator')
+        if schema.get('index_col') is not None:
+            read_kwargs['index_col'] = schema.get('index_col')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         x_id_is_reg_exp = schema.get('x_id_is_reg_exp', False)
-        index_col = schema.get('index_col')
         file_extensions = schema.get('file_extension', ['csv', 'xlsx', 'xls'])
         if isinstance(file_extensions, str):
             file_extensions = [file_extensions]
@@ -165,7 +174,7 @@ class Folder(object):
                     continue
                 file_info = {'file_stem' : file_path.stem,
                              'file_path': str(file_path)}
-                df = read(file, index_col=index_col, header=header)
+                df = read(file, **read_kwargs)
 
                 # strip only beginning and ending white space from column headers
                 df.columns = df.columns.str.strip()

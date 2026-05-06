@@ -13,21 +13,16 @@ schema = {
             "yaxes_visible": {"type": "boolean"},
             "x_axes_kwargs": {"type": "object"},
             "y_axes_kwargs": {"type": "object"},
-            "folder_include_filter": {"type": "string"},
-            "folder_exclude_filter": {"type": "string"},
+            "folder_include_filter": {"type": ["string", "array"]},
+            "folder_exclude_filter": {"type": ["string", "array"]},
             "schema": {"type": "object", "properties": {
                 "file_include_filter": {"type": ["string", "array"]},
                 "file_exclude_filter": {"type": ["string", "array"]},
                 "file_extension": {"type": "string"},
-                # "file_extension": {"type": "string", "enum": [
-                #     "csv",
-                #     "txt",
-                #     "xls",
-                #     "xlsx"
-                # ]},
-                "seperator": {"type": "string"},
+                "separator": {"type": "string"},
                 "header": {"type": ["integer", "array", "null", "string"]},
                 "index_col": {"type": ["null", "integer"]},
+                "pandas_read_kwargs": {"type": "object"},
                 "x_id_in_file_name": {"type": "boolean"},
                 "x_time_format": {"type": "string"},
                 "x_id_is_reg_exp": {"type": "boolean"},
@@ -37,29 +32,29 @@ schema = {
                     "file_name",
                 ]},
                 "remove_from_trace_label": {"type": "string"},
-            }},
+            }, "additionalProperties": False},
             "pre": {"type": "array", "items": {"oneOf": [
                 {"type": "string", "enum": [
                     "remove_null",
                     "remove_zero",
                     "remove_strings",
                     "convert_to_float",
-                ]},
+                ], "additionalProperties": False},
                 {"type": "object", "properties": {
                     "slice_start": {"type": "integer"},
                     "slice_end": {"type": "integer"},
                     "slice_step": {"type": "integer"},
-                }}
+                }, "additionalProperties": False}
             ]}},
             "post": {"type": "string", "enum": [
                 "avg",
                 "max",
                 "min",
-            ]},
+            ], "additionalProperties": False},
             "constant_lines": {"type": "object", "properties": {
                 "x=": {"type": "array", "items": {"type": "number"}},
                 "y=": {"type": "array", "items": {"type": "number"}},
-            }},
+            }, "additionalProperties": False},
             "error_y": {"type": "object", "properties": {
                 "type": {"type": "string", "enum": [
                     "percent",
@@ -67,13 +62,14 @@ schema = {
                 ]},
                 "value": {"type": "number"},
                 "visible": {"type": "boolean"},
-            }},
+            }, "additionalProperties": False},
             "pio.template": {"type": "string"},
             "trace_mode": {"type": "string",
                            "pattern": "^(lines|markers|text)(\\+(lines|markers|text))*(\\+(lines|markers|text))?$"},
             "marker_symbols": {"type": "array", "items": {"type": "integer"}},
             "update_traces_kwargs": {"type": "object"},
-        }
+        },
+    "additionalProperties": False
 }
 
 template = {
@@ -92,10 +88,11 @@ template = {
     "schema": {
         "file_include_filter": "must be in data file name, string or array of strings",
         "file_exclude_filter": "must not be in data file name, string or array of strings",
-        "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx",
-        "seperator": ",(default)",
+        "file_extension": "only set if you want to limit the data files to a certain type ie csv or xlsx or use a custom extension",
+        "separator": ",(default)",
         "header": "int row number(s) containing column labels and marking the start of the data (zero-indexed).",
         "index_col": "int of index column, NULL or don't include if not used",
+        "pandas_read_kwargs": "pass through any pandas.read_* key word arguments to pandas",
         "x_id_in_file_name": "true or false",
         "x_time_format": "string datetime format e.g. %y%m%d_%H%M%S",
         "x_id_is_reg_exp": "true or false, set to true if x_id is a regular expression",
