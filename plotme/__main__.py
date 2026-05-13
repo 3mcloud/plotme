@@ -12,9 +12,9 @@ def run():
     parser = argparse.ArgumentParser(
         description='automates plotting of tabular data, all arguments are optional')
 
-    parser.add_argument('--json', dest='plot_info_file', action="store",
+    parser.add_argument('--config', '-c', dest='plot_info_id', action="store",
                         default=plot_info_id, type=str,
-                        help="String to find config, default 'plot_info'")
+                        help=f"String to find config(s), default '{plot_info_id}'")
     parser.add_argument('-d', dest='data_root', action="store", default="",
                         type=str, help="Search directory, defaults to current")
     parser.add_argument('-gt', dest='template', action="store_true",

@@ -1,12 +1,12 @@
+import fnmatch
 import logging
 import re
-
 from difflib import get_close_matches
 from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-
+import pandas as pd
 from plotme.read import read
 
 
@@ -57,13 +57,18 @@ def preprocessing(df, pre):
     # use loop to sequence pre-processing items
     for item in pre:
         match item:
+            case "auto_clean":
+                # drop rows where all values are zero
+                df = df.loc[(df!=0).any(axis=1)]
+                # attempt to convert all cells to numeric, if can't convert then drop the row
+                df = df.apply(pd.to_numeric, errors='coerce').dropna()
             case "remove_null":
                 df = df.dropna()
             case "remove_zero":
                 df = df.loc[(df!=0).all(axis=1)]
             case "remove_strings":
-                # Remove rows containing any string value
-                df = df.loc[df.map(lambda x: not isinstance(x, str)).all(axis=1)]
+                # attempt to convert all cells to numeric, if can't convert then drop the row
+                df = df.apply(pd.to_numeric, errors='coerce').dropna()
             case "convert_to_float":
                 # Convert all cells in dataframe to float
                 df = df.astype(float)
@@ -113,9 +118,9 @@ def check_filter_match(filter_value, filename):
             # If it's not iterable, treat as single string
             filters = [str(filter_value)]
     
-    # Check if any filter matches the filename
+    # Check if any filter matches the filename (supports wildcards via fnmatch)
     for filter_item in filters:
-        if filter_item in filename:
+        if fnmatch.fnmatch(filename, filter_item) or filter_item in filename:
             return True
     
     return False
@@ -237,9 +242,13 @@ class Folder(object):
             time_stamp = datetime.strptime(extracted, x_time_format).timestamp()
             if self.args_dict.get('min_timestamp') is None:
                 self.args_dict['min_timestamp'] = time_stamp
+            else:
+                self.args_dict['min_timestamp'] = min(self.args_dict['min_timestamp'], time_stamp)
+            if self.args_dict.get('ref_timestamp') is None:
+                self.args_dict['ref_timestamp'] = time_stamp
                 x_value = 0
             else:
-                x_value = time_stamp - self.args_dict['min_timestamp']
+                x_value = time_stamp - self.args_dict['ref_timestamp']
         else:
             x_value = float(extracted)
         return x_value

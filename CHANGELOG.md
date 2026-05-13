@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-05-13
+
+### Added
+- sorting of data folders, makes behavior more consistant with different OSes
+- ability to use wild cards in filters using fnmatch
+- `auto_clean` `pre` processing option
+
+### Changed
+- plot_info_id override argument to --config from --json to be consistent with support for both json and yml
+
+### Fixed
+- `pre` processsing option `remove_strings` but it also removes any Null
+- `x_id_in_file_name` with `x_time_format` on MacOS and Linux 
+
 ## [1.6.0] - 2026-05-06
 
 ### Added

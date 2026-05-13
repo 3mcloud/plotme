@@ -28,10 +28,12 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
 * remove common text from all trace labels `remove_from_trace_label`
 * only re-generate plots if data or plot_info has changed, to force regeneration `plotme -f`
 * pre-process `pre` options
-  * data cleaning: `remove_null`, `remove_zero`, `remove_strings`, `convert_to_float`
+  * data cleaning: `auto_clean`, `remove_null`, `remove_zero`, `remove_strings`, `convert_to_float`
   * slice: `slice_start`, `slice_end`, `slice_step`
 * post-process `post` (`max`, `min`, `avg`)
-* x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
+* `x_id_in_file_name` - requires a `post` processing set
+  * value of `x_id` used to split file name, e.g. file names like sample_1.csv, sample_2.csv, `x_id` would be 'sample_'
+  * x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
 * extract x value from filename using regular expression `x_id_is_reg_exp`
 
 ## Install options
@@ -98,6 +100,7 @@ in this example
 3. pkl data file support
 4. 3D plots
 5. plot_info linter
+6. allow post-process on entire trace when using x_id_in_
 
 ### Develop
 1. clone 

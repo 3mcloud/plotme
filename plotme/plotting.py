@@ -31,7 +31,7 @@ def plot_all(args_dict={}):
 
     """
 
-    plot_info_file = args_dict.get('plot_info_file', plot_info_id)
+    plot_info_file = args_dict.get('plot_info_id', plot_info_id)
 
     data_root = Path(args_dict.get('data_root', os.getcwd()))
     plot_info_files = (
@@ -127,6 +127,8 @@ def single_plot(args_dict={}):
 
     folders = glob.glob(f"{plot_dir}/**/", recursive=True)
     folders.append(plot_dir)  # include the data_root directory
+    # sort folders alphabetically, this is important for consistent trace labeling and marker symbol assignment
+    folders = sorted(folders, key=str)
 
     # Add only the folders that the filters allow
     folder_datas = []
@@ -149,6 +151,16 @@ def single_plot(args_dict={}):
     # determine plot_source, plot_source used if df_type is 'trace' or 'point'
     n_folder_datas = len(folder_datas)
     logging.debug(f"n_folder_datas: {n_folder_datas}")
+
+    # check if timestamps need fixing and fix if needed
+    if args_dict.get('ref_timestamp') is not None:
+        if args_dict['ref_timestamp'] != args_dict['min_timestamp']:
+            # calculate shift, it should be postive
+            time_shift = args_dict['ref_timestamp'] - args_dict['min_timestamp']
+            logging.debug(f"time_shift: {time_shift}")
+            # shift the x data
+            for folder_data in folder_datas:
+                folder_data.x = [{k: [v + time_shift for v in vals] for k, vals in trace.items()} for trace in folder_data.x]
 
     x_dict = {}
     y_dict = {}

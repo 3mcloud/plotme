@@ -36,7 +36,7 @@ def test_simple_random_data():
     with open(test_spec_file, "w") as json_file:
         json_file.write(test_plot_info_stream)
 
-    ret = plot_all({"force": True, "plot_info_file": plot_info_filter})
+    ret = plot_all({"force": True, "plot_info_id": plot_info_filter})
 
     os.remove(test_spec_file)
 
@@ -80,7 +80,7 @@ def test_yaml_plot_info():
         with open(test_spec_file, "w") as yaml_file:
             yaml.dump(test_plot_info, yaml_file)
 
-        ret = plot_all({"force": True, "plot_info_file": plot_info_filter})
+        ret = plot_all({"force": True, "plot_info_id": plot_info_filter})
 
         os.remove(test_spec_file)
         assert ret == 0, f"should return 0 for .{ext} plot_info file"

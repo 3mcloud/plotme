@@ -35,6 +35,7 @@ schema = {
             }, "additionalProperties": False},
             "pre": {"type": "array", "items": {"oneOf": [
                 {"type": "string", "enum": [
+                    "auto_clean",
                     "remove_null",
                     "remove_zero",
                     "remove_strings",
@@ -99,7 +100,8 @@ template = {
         "trace_label": "file_name(default), other options: folder_name",
         "remove_from_trace_label": "string to remove from trace labels"
     },
-    "pre": ["remove_null",
+    "pre": ["auto_clean",
+            "remove_null",
             "remove_zero",
             "remove_strings",
             "convert_to_float",
