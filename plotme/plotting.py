@@ -4,6 +4,8 @@ import logging
 import os
 from pathlib import Path
 
+import yaml
+
 import plotly.graph_objects as go
 import plotly.io as pio
 from dirhash import dirhash
@@ -29,10 +31,14 @@ def plot_all(args_dict={}):
 
     """
 
-    plot_info_file = args_dict.get('plot_info_file', plot_info_id)
+    plot_info_file = args_dict.get('plot_info_id', plot_info_id)
 
     data_root = Path(args_dict.get('data_root', os.getcwd()))
-    plot_info_files = list(data_root.glob(f"**/*{plot_info_file}.json"))
+    plot_info_files = (
+        list(data_root.glob(f"**/*{plot_info_file}.json")) +
+        list(data_root.glob(f"**/*{plot_info_file}.yaml")) +
+        list(data_root.glob(f"**/*{plot_info_file}.yml"))
+    )
 
     # save template plot_info.json
     if len(plot_info_files) == 0 or args_dict.get('template'):
@@ -65,8 +71,11 @@ def plot_all(args_dict={}):
             logging.info(f"no changes detected, skipping {file}")
         else:
             logging.info(f'loading plot settings from {file}')
-            with open(file) as json_file:
-                plot_info = json.load(json_file)
+            with open(file) as plot_info_file_handle:
+                if file.suffix.lower() in ('.yaml', '.yml'):
+                    plot_info = yaml.safe_load(plot_info_file_handle)
+                else:
+                    plot_info = json.load(plot_info_file_handle)
             validate(instance=plot_info, schema=schema)
             plot_info['plot_dir'] = dir_path
             plot_info['plot_info_file'] = file
@@ -118,6 +127,8 @@ def single_plot(args_dict={}):
 
     folders = glob.glob(f"{plot_dir}/**/", recursive=True)
     folders.append(plot_dir)  # include the data_root directory
+    # sort folders alphabetically, this is important for consistent trace labeling and marker symbol assignment
+    folders = sorted(folders, key=str)
 
     # Add only the folders that the filters allow
     folder_datas = []
@@ -140,6 +151,16 @@ def single_plot(args_dict={}):
     # determine plot_source, plot_source used if df_type is 'trace' or 'point'
     n_folder_datas = len(folder_datas)
     logging.debug(f"n_folder_datas: {n_folder_datas}")
+
+    # check if timestamps need fixing and fix if needed
+    if args_dict.get('ref_timestamp') is not None:
+        if args_dict['ref_timestamp'] != args_dict['min_timestamp']:
+            # calculate shift, it should be postive
+            time_shift = args_dict['ref_timestamp'] - args_dict['min_timestamp']
+            logging.debug(f"time_shift: {time_shift}")
+            # shift the x data
+            for folder_data in folder_datas:
+                folder_data.x = [{k: [v + time_shift for v in vals] for k, vals in trace.items()} for trace in folder_data.x]
 
     x_dict = {}
     y_dict = {}

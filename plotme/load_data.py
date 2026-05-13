@@ -1,12 +1,12 @@
+import fnmatch
 import logging
 import re
-
 from difflib import get_close_matches
 from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-
+import pandas as pd
 from plotme.read import read
 
 
@@ -50,21 +50,42 @@ def pre_process_abs_sum_remove(df, to_remove=0., col_1='', col_2=''):
 
 
 def preprocessing(df, pre):
-    # use loop to sequence pre-processing steps
-    for step in pre:
-        match step:
+    start = 0
+    end = len(df)
+    step = 1
+
+    # use loop to sequence pre-processing items
+    for item in pre:
+        match item:
+            case "auto_clean":
+                # drop rows where all values are zero
+                df = df.loc[(df!=0).any(axis=1)]
+                # attempt to convert all cells to numeric, if can't convert then drop the row
+                df = df.apply(pd.to_numeric, errors='coerce').dropna()
             case "remove_null":
                 df = df.dropna()
             case "remove_zero":
                 df = df.loc[(df!=0).all(axis=1)]
             case "remove_strings":
-                # Remove rows containing any string value
-                df = df.loc[df.map(lambda x: not isinstance(x, str)).all(axis=1)]
+                # attempt to convert all cells to numeric, if can't convert then drop the row
+                df = df.apply(pd.to_numeric, errors='coerce').dropna()
             case "convert_to_float":
                 # Convert all cells in dataframe to float
                 df = df.astype(float)
+            case {"slice_start": value}:
+                start = int(value)
+                logging.debug(f"slice_start set to {start}")
+            case {"slice_end": value}:
+                end = int(value)
+                logging.debug(f"slice_end set to {end}")
+            case {"slice_step": value}:
+                step = int(value)
+                logging.debug(f"slice_step set to {step}")
             case _:  # Default case (optional)
-                logging.warning(f"Unknown preprocessing step: {step}")
+                logging.warning(f"Unknown preprocessing: {item}")
+    
+    if start != 0 or end != len(df) or step != 1:
+        df = df.iloc[start:end:step]
     return df
 
 
@@ -97,9 +118,9 @@ def check_filter_match(filter_value, filename):
             # If it's not iterable, treat as single string
             filters = [str(filter_value)]
     
-    # Check if any filter matches the filename
+    # Check if any filter matches the filename (supports wildcards via fnmatch)
     for filter_item in filters:
-        if filter_item in filename:
+        if fnmatch.fnmatch(filename, filter_item) or filter_item in filename:
             return True
     
     return False
@@ -123,10 +144,16 @@ class Folder(object):
         self.schema = schema = args_dict.get('schema', {})
         include_filter = schema.get('file_include_filter')
         exclude_filter = schema.get('file_exclude_filter')
-        header = schema.get('header', 'infer')
+        # build read_kwargs
+        read_kwargs = schema.get('pandas_read_kwargs', {})
+        if schema.get('header'):
+            read_kwargs['header'] = schema.get('header')
+        if schema.get('separator'):
+            read_kwargs['sep'] = schema.get('separator')
+        if schema.get('index_col') is not None:
+            read_kwargs['index_col'] = schema.get('index_col')
         x_id_in_file_name = schema.get('x_id_in_file_name', False)
         x_id_is_reg_exp = schema.get('x_id_is_reg_exp', False)
-        index_col = schema.get('index_col')
         file_extensions = schema.get('file_extension', ['csv', 'xlsx', 'xls'])
         if isinstance(file_extensions, str):
             file_extensions = [file_extensions]
@@ -134,7 +161,7 @@ class Folder(object):
         for file_extension in file_extensions:
             # TODO rename file_extension or split into 2 variables
             match_string = str(Path(f"*{file_extension}"))
-            ext_data = list(Path(directory).glob(match_string))
+            ext_data = list(Path(directory).glob(match_string, case_sensitive=False))
             data_files.extend(ext_data)
             logging.debug(f"{directory}'s match_string: {match_string}")
         logging.debug(f"{directory}'s data_files: {data_files}")
@@ -152,7 +179,7 @@ class Folder(object):
                     continue
                 file_info = {'file_stem' : file_path.stem,
                              'file_path': str(file_path)}
-                df = read(file, index_col=index_col, header=header)
+                df = read(file, **read_kwargs)
 
                 # strip only beginning and ending white space from column headers
                 df.columns = df.columns.str.strip()
@@ -215,9 +242,13 @@ class Folder(object):
             time_stamp = datetime.strptime(extracted, x_time_format).timestamp()
             if self.args_dict.get('min_timestamp') is None:
                 self.args_dict['min_timestamp'] = time_stamp
+            else:
+                self.args_dict['min_timestamp'] = min(self.args_dict['min_timestamp'], time_stamp)
+            if self.args_dict.get('ref_timestamp') is None:
+                self.args_dict['ref_timestamp'] = time_stamp
                 x_value = 0
             else:
-                x_value = time_stamp - self.args_dict['min_timestamp']
+                x_value = time_stamp - self.args_dict['ref_timestamp']
         else:
             x_value = float(extracted)
         return x_value

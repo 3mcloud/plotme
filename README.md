@@ -2,13 +2,13 @@
 scatter plot all the things in all the folders automatically but only if there have been changes
 
 ## Description
-Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It is a command line tool written in python. It uses json files to configure the plots. It is for technical and non-techncial folks.
+Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It is a command line tool written in python. It uses json or yaml files to configure the plots. It is for technical and non-techncial folks.
 
 ## Features
 * specify data_root using argument or current directory
 * save the plot's configuration/definition with the data (plot_info.json)
 * finds plot_info files at any depth in the folder tree
-* validation plot_info.json using jsonschema
+* validation plot_info.json/yml/yaml using jsonschema
 * pass-through to plotly
   * scatter plot
     * `trace_mode` (markers or lines) 
@@ -20,15 +20,20 @@ Plotme takes tabular data (e.g. excel) and outputs interactive scatter plots. It
   * `update_layout_kwargs` plotly layout keyword arguments e.g. 'font', 'legend' etc
   * `update_traces_kwargs` plotly traces keyword arguments e.g. 'marker', 'selector' etc
 * auto-detect data files (xls, xlsx, csv only)
-* supported data files: xls, xlsx, csv, txt
+* supported data files: xls, xlsx, csv, txt, and any text file readable by pandas.read_csv()
+* Pass `header` `separator`, `index_col` and any other kwargs using `pandas_read_kwargs` [read_csv()](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html) [read_excel()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html)
 * filter data files (include and exclude) `folder_include_filter`, `folder_exclude_filter`, 
 * filter folders (include and exclude) `file_include_filter`, `file_exclude_filter`, 
 * trace label from y_id (when plot is single file) or file name (default) or folder name `trace_label`
 * remove common text from all trace labels `remove_from_trace_label`
 * only re-generate plots if data or plot_info has changed, to force regeneration `plotme -f`
-* pre-process `pre`
-* post-process (max, min, avg) `post`
-* x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
+* pre-process `pre` options
+  * data cleaning: `auto_clean`, `remove_null`, `remove_zero`, `remove_strings`, `convert_to_float`
+  * slice: `slice_start`, `slice_end`, `slice_step`
+* post-process `post` (`max`, `min`, `avg`)
+* `x_id_in_file_name` - requires a `post` processing set
+  * value of `x_id` used to split file name, e.g. file names like sample_1.csv, sample_2.csv, `x_id` would be 'sample_'
+  * x value time stamp in file name conversion to seconds using [strptime format codes](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) `x_time_format`
 * extract x value from filename using regular expression `x_id_is_reg_exp`
 
 ## Install options
@@ -92,10 +97,10 @@ in this example
 0. sign exe and add to releases
 1. create better tests
 2. Hierarchical plot_info based on folder structure
-3. yml support
-4. pkl data file support
-5. 3D plots
-6. plot_info linter
+3. pkl data file support
+4. 3D plots
+5. plot_info linter
+6. allow post-process on entire trace when using x_id_in_
 
 ### Develop
 1. clone 
@@ -112,5 +117,5 @@ in this example
 
 ### Test
 1. follow Develop instructions
-2. Install packages to run automated tests `python -m pip install -e .[test]`
+2. Install packages to run automated tests `python -m pip install -e '.[test]'` or `pipx install -e '.[test]' -f`
 1. run tests

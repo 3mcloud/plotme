@@ -13,7 +13,7 @@ authors = [
   {name = "Daniel Garcia", email = "dgarcia7654@users.noreply.github.com"}
 ]
 requires-python = ">=3.8"
-license = "LicenseRef-Proprietary"
+license = {file = "LICENSE"}
 keywords = ["plotting", "data", "plotly", "cli"]
 dependencies = [
   'dirhash',
@@ -22,6 +22,7 @@ dependencies = [
   'openpyxl',
   'pandas',
   'plotly',
+  'PyYAML',
   'scandir',
 ]
 
